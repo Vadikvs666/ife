@@ -98,5 +98,6 @@
       </GridPane>
       <Button layoutX="719.0" layoutY="310.0" mnemonicParsing="false" text="Очистить" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="315.0" />
       <Button layoutX="586.0" layoutY="315.0" mnemonicParsing="false" text="Сохранить" AnchorPane.rightAnchor="115.0" AnchorPane.topAnchor="315.0" />
+      <Button fx:id="settingsButton" layoutX="620.0" layoutY="559.0" mnemonicParsing="false" onAction="#onSettingsButton" text="Настройки" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="102.0" />
     </children>
 </AnchorPane>
