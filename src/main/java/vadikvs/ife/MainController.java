@@ -16,6 +16,8 @@ public class MainController implements Initializable {
     public Signal close=new Signal();
     @FXML
     private Button closeButton;
+    @FXML
+    private Button settingsButton;
    
     
     @FXML
@@ -23,6 +25,11 @@ public class MainController implements Initializable {
          close.emit();
          Stage stage = (Stage) closeButton.getScene().getWindow();
          stage.close();
+    }
+    
+    @FXML
+    private void onSettingsButton(){
+        
     }
     
     @Override
