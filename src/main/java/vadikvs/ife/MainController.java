@@ -46,7 +46,6 @@ public class MainController implements Initializable {
             dialog.setScene(scene);
             SettingController controller = loader.getController();
             controller.setStage(dialog);
-            close.connect(controller.close);
             dialog.showAndWait();       
         } catch (IOException e) {
             e.printStackTrace();
