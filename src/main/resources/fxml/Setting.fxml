@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane id="AnchorPane" prefHeight="244.0" prefWidth="594.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111" fx:controller="vadikvs.ife.SettingController">
+<AnchorPane id="AnchorPane" prefHeight="244.0" prefWidth="594.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vadikvs.ife.SettingController">
     <stylesheets>
         <URL value="@/styles/setting.css" />
     </stylesheets>
@@ -26,9 +26,9 @@
         </rowConstraints>
          <children>
             <Label text="Путь к файлу" />
-            <TextField fx:id="fileNameText" onInputMethodTextChanged="#fileNameTextChanged" GridPane.columnIndex="1" />
-            <TextField fx:id="userText" onInputMethodTextChanged="#userTextChanged" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="passText" onInputMethodTextChanged="#passwordTextChanged" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="fileNameText" onKeyReleased="#setChanged" GridPane.columnIndex="1" />
+            <TextField fx:id="userText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="passwordText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="Имя пользователя" GridPane.rowIndex="1" />
             <Label text="Пароль" GridPane.rowIndex="2" />
          </children>

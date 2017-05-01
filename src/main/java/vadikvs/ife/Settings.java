@@ -66,8 +66,8 @@ public class Settings {
         String user = prefs.get("user", null);
         String pass = prefs.get("password", null);
         if (file != null && user != null && pass != null) {
-            setUser(file);
-            setFilePath(user);
+            setUser(user);
+            setFilePath(file);
             setPassword(pass);
             return true;
         } else {
