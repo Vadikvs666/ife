@@ -1,9 +1,7 @@
 package vadikvs.ife;
 
-import com.sun.javafx.sg.prism.NGNode;
-import com.vadikvs.Signalslots.Signal;
 
-import java.io.IOException;
+import com.vadikvs.Signalslots.Signal;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -11,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 
@@ -33,9 +30,5 @@ public class MainController implements Initializable {
         // TODO
         
     } 
-    
-  
-
-
   
 }
