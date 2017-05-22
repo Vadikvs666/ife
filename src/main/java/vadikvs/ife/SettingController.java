@@ -31,6 +31,9 @@ public class SettingController implements Initializable {
     private TextField fileNameText;
     @FXML
     private TextField userText;
+    
+    @FXML
+    private TextField serverText;
     @FXML
     private TextField passwordText;
     private Stage stage;
@@ -44,6 +47,7 @@ public class SettingController implements Initializable {
         settings.setFilePath(fileNameText.getText());
         settings.setUser(userText.getText());
         settings.setPassword(passwordText.getText());
+        settings.setServer(serverText.getText());
     }
     @FXML
     protected void onResetButton(){
@@ -77,6 +81,7 @@ public class SettingController implements Initializable {
         fileNameText.setText(settings.getFilePath());
         userText.setText(settings.getUser());
         passwordText.setText(settings.getPassword());
+        serverText.setText(settings.getServer());
         
     }
     

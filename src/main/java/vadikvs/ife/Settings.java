@@ -30,8 +30,9 @@ public class Settings {
         return server.get();
     }
 
-    public void setServer(String server) {
-        this.server.set(server); 
+    public void setServer(String serv) {
+        server.set(serv); 
+        save();
     }
     
     public String getFilePath() {

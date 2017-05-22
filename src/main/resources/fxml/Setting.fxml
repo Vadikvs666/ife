@@ -23,14 +23,17 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label text="Путь к файлу" />
             <TextField fx:id="fileNameText" onKeyReleased="#setChanged" GridPane.columnIndex="1" />
             <TextField fx:id="userText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <TextField fx:id="passwordText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="serverText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label text="Имя пользователя" GridPane.rowIndex="1" />
             <Label text="Пароль" GridPane.rowIndex="2" />
+            <Label text="Сервер" GridPane.rowIndex="3" />
          </children>
       </GridPane>
       <Button fx:id="closeButton" layoutX="499.0" layoutY="199.0" maxHeight="31.0" maxWidth="120.0" mnemonicParsing="false" onAction="#onCloseButton" prefHeight="31.0" prefWidth="120.0" text="Закрыть" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
