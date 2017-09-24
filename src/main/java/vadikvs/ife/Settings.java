@@ -19,12 +19,22 @@ public class Settings {
     private StringProperty filePath;
     private StringProperty user;
     private StringProperty password;
+    private StringProperty server;
     private Map<String,String> settings;
 
     public String getPassword() {
         return password.get();
     }
 
+    public String getServer() {
+        return server.get();
+    }
+
+    public void setServer(String serv) {
+        server.set(serv); 
+        save();
+    }
+    
     public String getFilePath() {
         return filePath.get();
     }
@@ -58,6 +68,7 @@ public class Settings {
         prefs.put("filePath", getFilePath());
         prefs.put("user", getUser());
         prefs.put("password", getPassword());
+        prefs.put("server", getServer());
     }
 
     private Boolean load() {
@@ -65,10 +76,12 @@ public class Settings {
         String file = prefs.get("filePath", null);
         String user = prefs.get("user", null);
         String pass = prefs.get("password", null);
-        if (file != null && user != null && pass != null) {
+        String server = prefs.get("server", null);
+        if (file != null && user != null && pass != null&& server!=null) {
             setUser(user);
             setFilePath(file);
             setPassword(pass);
+            setServer(server);
             return true;
         } else {
             return false;
@@ -85,6 +98,7 @@ public class Settings {
         filePath = new SimpleStringProperty("");
         user = new SimpleStringProperty("");
         password = new SimpleStringProperty("");
+        server =new SimpleStringProperty("");
     }
 
 }
