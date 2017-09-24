@@ -20,6 +20,56 @@ public class Settings {
     private StringProperty user;
     private StringProperty password;
     private StringProperty server;
+    private StringProperty serverMail;
+
+    public String getServerMail() {
+        return serverMail.get();
+    }
+
+    public void setServerMail(String serverMail) {
+        this.serverMail.set(serverMail);
+        save();
+    }
+
+    public String getProtocolMail() {
+        return protocolMail.get();
+    }
+
+    public void setProtocolMail(String protocolMail) {
+        this.protocolMail.set(protocolMail);
+        save();
+    }
+
+    public String getUserMail() {
+        return userMail.get();
+    }
+
+    public void setUserMail(String userMail) {
+        this.userMail.set(userMail);
+        save();
+    }
+
+    public String getUserPassword() {
+        return userPassword.get();
+    }
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword.set(userPassword);
+        save();
+    }
+
+    public String getPortMail() {
+        return portMail.get();
+    }
+
+    public void setPortMail(String portMail) {
+        this.portMail.set(portMail);
+        save();
+    }
+    private StringProperty protocolMail;
+    private StringProperty userMail;
+    private StringProperty userPassword;
+    private StringProperty portMail;
     private Map<String,String> settings;
 
     public String getPassword() {
@@ -69,6 +119,7 @@ public class Settings {
         prefs.put("user", getUser());
         prefs.put("password", getPassword());
         prefs.put("server", getServer());
+        prefs.put("serverMail", getServerMail());
     }
 
     private Boolean load() {
