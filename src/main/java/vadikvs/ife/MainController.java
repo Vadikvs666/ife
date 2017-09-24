@@ -23,7 +23,10 @@ public class MainController implements Initializable {
     private Button closeButton;
     @FXML
     private Button settingsButton;
-   
+    @FXML
+    private Button importButton;
+    @FXML
+    private Button mailButton;
     
     @FXML
     private void onCloseButton(ActionEvent event) {
@@ -45,6 +48,48 @@ public class MainController implements Initializable {
             Scene scene = new Scene(page);
             dialog.setScene(scene);
             SettingController controller = loader.getController();
+            controller.setStage(dialog);
+            dialog.showAndWait();       
+        } catch (IOException e) {
+            e.printStackTrace();
+           
+        } 
+    }
+    
+    @FXML
+    private void onImportButton(){
+       try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("/fxml/Setting.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+            Stage dialog = new Stage();
+            Stage stage = (Stage) closeButton.getScene().getWindow();;
+            dialog.setTitle("Настройки");
+            dialog.initOwner(stage);
+            Scene scene = new Scene(page);
+            dialog.setScene(scene);
+            SettingController controller = loader.getController();
+            controller.setStage(dialog);
+            dialog.showAndWait();       
+        } catch (IOException e) {
+            e.printStackTrace();
+           
+        } 
+    }
+    
+    @FXML
+    private void onMailButton(){
+       try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("/fxml/Mail.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+            Stage dialog = new Stage();
+            Stage stage = (Stage) closeButton.getScene().getWindow();;
+            dialog.setTitle("Почта");
+            dialog.initOwner(stage);
+            Scene scene = new Scene(page);
+            dialog.setScene(scene);
+            MailController controller = loader.getController();
             controller.setStage(dialog);
             dialog.showAndWait();       
         } catch (IOException e) {
