@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -36,6 +37,18 @@ public class SettingController implements Initializable {
     private TextField serverText;
     @FXML
     private TextField passwordText;
+    @FXML
+    private TextField hostText;
+    @FXML
+    private TextField protocolText;
+    @FXML
+    private TextField portText;
+    @FXML
+    private TextField emailText;
+    @FXML
+    private TextField countText;
+    @FXML
+    private PasswordField passwordMailText;
     private Stage stage;
     private Settings settings;
     private Boolean changed=false;
@@ -48,6 +61,12 @@ public class SettingController implements Initializable {
         settings.setUser(userText.getText());
         settings.setPassword(passwordText.getText());
         settings.setServer(serverText.getText());
+        settings.setServerMail(hostText.getText());
+        settings.setProtocolMail(protocolText.getText());
+        settings.setPortMail(portText.getText());
+        settings.setUserMail(emailText.getText());
+        settings.setUserPassword(passwordMailText.getText());
+        settings.setCountMail(countText.getText());
     }
     @FXML
     protected void onResetButton(){
@@ -82,6 +101,13 @@ public class SettingController implements Initializable {
         userText.setText(settings.getUser());
         passwordText.setText(settings.getPassword());
         serverText.setText(settings.getServer());
+        hostText.setText(settings.getServerMail());
+        protocolText.setText(settings.getProtocolMail());
+        portText.setText(settings.getPortMail());
+        emailText.setText(settings.getUserMail());
+        countText.setText(settings.getCountMail());
+        passwordMailText.setText(settings.getUserPassword());
+        
         
     }
     

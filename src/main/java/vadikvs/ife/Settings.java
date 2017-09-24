@@ -21,6 +21,16 @@ public class Settings {
     private StringProperty password;
     private StringProperty server;
     private StringProperty serverMail;
+    private StringProperty countMail;
+
+    public String getCountMail() {
+        return countMail.get();
+    }
+
+    public void setCountMail(String countMail) {
+        this.countMail.set(countMail);
+        save();
+    }
 
     public String getServerMail() {
         return serverMail.get();
@@ -120,6 +130,11 @@ public class Settings {
         prefs.put("password", getPassword());
         prefs.put("server", getServer());
         prefs.put("serverMail", getServerMail());
+        prefs.put("protocolMail", getProtocolMail());
+        prefs.put("userMail", getUserMail());
+        prefs.put("portMail", getPortMail());
+        prefs.put("userPassword", getUserPassword());
+        prefs.put("countMail", getCountMail());
     }
 
     private Boolean load() {
@@ -128,11 +143,32 @@ public class Settings {
         String user = prefs.get("user", null);
         String pass = prefs.get("password", null);
         String server = prefs.get("server", null);
-        if (file != null && user != null && pass != null&& server!=null) {
+        String serverMailS =prefs.get("serverMail", null);
+        String protocolMailS =prefs.get("protocolMail", null);
+        String userMailS =prefs.get("userMail", null);
+        String portMailS =prefs.get("portMail", null);
+        String userPasswordS =prefs.get("userPassword", null);
+        String countMailS =prefs.get("countMail", null);
+        if (file != null 
+                && user != null 
+                && pass != null
+                && server!=null
+                && serverMailS != null
+                && protocolMailS != null
+                && userMailS != null
+                && portMailS != null
+                && userPasswordS != null
+                && countMailS!= null) {
             setUser(user);
             setFilePath(file);
             setPassword(pass);
             setServer(server);
+            setServerMail(serverMailS);
+            setProtocolMail(protocolMailS);
+            setPortMail(portMailS);
+            setUserMail(userMailS);
+            setUserPassword(userPasswordS);
+            setCountMail(countMailS);
             return true;
         } else {
             return false;
@@ -150,6 +186,12 @@ public class Settings {
         user = new SimpleStringProperty("");
         password = new SimpleStringProperty("");
         server =new SimpleStringProperty("");
+        serverMail=new SimpleStringProperty("");
+        protocolMail=new SimpleStringProperty("");
+        portMail=new SimpleStringProperty("");
+        userMail=new SimpleStringProperty("");
+        userPassword=new SimpleStringProperty("");
+        countMail=new SimpleStringProperty("0");
     }
 
 }

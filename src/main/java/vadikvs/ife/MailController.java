@@ -31,27 +31,29 @@ public class MailController implements Initializable {
     private TableView mailTableView;
     @FXML
     private ListView fileListView;
+    
+    private Settings settings;
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+        settings=new Settings();
         TableColumn senderNameCol = new TableColumn("Отправитель");
         TableColumn temeNameCol = new TableColumn("Тема");
         TableColumn dateNameCol = new TableColumn("Дата");   
         mailTableView.getColumns().addAll(senderNameCol, temeNameCol, dateNameCol);
         
-        String protocol = "imap";
-        String host = "imap.mail.ru";
-        String port = "993";
+        String protocol = settings.getProtocolMail();
+        String host = settings.getServerMail();
+        String port = settings.getPortMail();
  
  
-        String userName = "*";
-        String password = "*";
- 
+        String userName = settings.getUserMail();
+        String password = settings.getUserPassword();
+        String count = settings.getCountMail();
         Email receiver = new Email();
-        receiver.downloadEmails(protocol, host, port, userName, password);
+        receiver.getMessages(protocol, host, port, userName, password,Integer.valueOf(count));
     }    
     
     public void setStage(Stage stage){
