@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Label?>
 
 <AnchorPane id="AnchorPane" prefHeight="453.0" prefWidth="971.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111" fx:controller="vadikvs.ife.MailController">
     <stylesheets>
@@ -15,12 +16,16 @@
         <TableView fx:id="mailTableView" layoutX="33.0" layoutY="27.0" onKeyPressed="#onMailSelect" onMouseClicked="#onMailSelect" prefHeight="200.0" prefWidth="200.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
             <columns>
                 <!-- Колонки таблицы -->
+                <TableColumn prefWidth="50.0" text="#" fx:id="idColumn" />
                 <TableColumn prefWidth="250.0" text="Отправитель" fx:id="fromColumn" />
                 <TableColumn prefWidth="250.0" text="Тема" fx:id="subjectColumn" />
                 <TableColumn prefWidth="150.0" text="Дата" fx:id="dateColumn" />
             </columns>
         </TableView>
+        <Label text="Вложения:" AnchorPane.bottomAnchor="215.0" AnchorPane.leftAnchor="15.0"  />
         <ListView fx:id="fileListView" layoutX="15.0" layoutY="227.0" onKeyPressed="#onFileSelect" onMouseClicked="#onFileSelect" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" />
+        <Button fx:id="addButton"  prefWidth="50.0" mnemonicParsing="false" onAction="#onAddButton" text="-->" AnchorPane.bottomAnchor="115.0" AnchorPane.leftAnchor="230.0" />
+        <ListView fx:id="addedfileListView" layoutX="15.0" layoutY="227.0" onKeyPressed="#onFileSelect" onMouseClicked="#onFileSelect" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="295.0" />
         <Button fx:id="exitButton" layoutX="891.0" layoutY="407.0" maxWidth="65.0" minWidth="65.0" mnemonicParsing="false" onAction="#onExitButton" text="Выход" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
         <Button fx:id="sendButton" layoutX="810.0" layoutY="407.0" mnemonicParsing="false" onAction="#onSendButton" text="Отправить файл" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
     </children>

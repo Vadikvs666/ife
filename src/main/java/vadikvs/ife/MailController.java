@@ -5,6 +5,7 @@
  */
 package vadikvs.ife;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -18,8 +19,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import vadikvs.ife.Email;
-import javafx.scene.control.TableView.TableViewSelectionModel;
+import javax.mail.Message;
 
 /**
  * FXML Controller class
@@ -30,7 +30,7 @@ public class MailController implements Initializable {
 
     private ObservableList<MessageEntity> messageData = FXCollections.observableArrayList();
     private ObservableList<String> atachData = FXCollections.observableArrayList();
-
+    private Email email;
     private Stage stage;
     @FXML
     private Button exitButton;
@@ -49,6 +49,8 @@ public class MailController implements Initializable {
 
     @FXML
     private TableColumn<MessageEntity, Date> dateColumn;
+    @FXML
+    private TableColumn<MessageEntity, Integer> idColumn;
 
     private Settings settings;
 
@@ -58,26 +60,26 @@ public class MailController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         settings = new Settings();
-
         String protocol = settings.getProtocolMail();
         String host = settings.getServerMail();
         String port = settings.getPortMail();
         String userName = settings.getUserMail();
         String password = settings.getUserPassword();
         String count = settings.getCountMail();
-
-        Email email = new Email();
-        messageData = email.getMessages(protocol, host, port, userName, password, Integer.valueOf(count));
-
+        email = new Email(protocol, host, port, userName, password);
+        Message[] messages = email.getMessages("INBOX", Integer.valueOf(count));
+        for (int i= Integer.valueOf(count)-1;i>=0;i--) {
+            MessageEntity entity = new MessageEntity(messages[i]);
+            messageData.add(entity);
+        }
         sendButton.setDisable(true);
-        
+        idColumn.setCellValueFactory(new PropertyValueFactory<MessageEntity, Integer>("id"));
         fromColumn.setCellValueFactory(new PropertyValueFactory<MessageEntity, String>("from"));
         subjectColumn.setCellValueFactory(new PropertyValueFactory<MessageEntity, String>("subject"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<MessageEntity, Date>("date"));
         mailTableView.setItems(messageData);
         mailTableView.setEditable(true);
-        /*mailTableView.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> fillAtachmentListView(newValue));*/
+
     }
 
     public void setStage(Stage stage) {
@@ -86,38 +88,37 @@ public class MailController implements Initializable {
 
     @FXML
     public void onExitButton() {
+        email.disconnect();
         stage.close();
     }
 
     @FXML
     public void onMailSelect() {
         //
-        
-        MessageEntity entity=mailTableView.getSelectionModel().selectedItemProperty().getValue();
-        atachData=entity.getAtach();
+
+        MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
+        atachData = entity.getAtach();
         fileListView.setItems(atachData);
     }
-
+    @FXML
+    public void onAddButton(){
+        
+    }
     @FXML
     public void onFileSelect() {
         //
-        
+
         sendButton.setDisable(false);
-        
+
     }
 
     @FXML
     public void onSendButton() {
         //
-        String filename=fileListView.getSelectionModel().selectedItemProperty().getValue();
-        MessageEntity entity=mailTableView.getSelectionModel().selectedItemProperty().getValue();
-        System.out.println(entity.getFrom()+" file name "+filename);
-        entity.saveFileByFilename(filename);
+        String filename = fileListView.getSelectionModel().selectedItemProperty().getValue();
+        MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
+        entity.saveAtachByFilename("/tmp/ife/atach/"+entity.getFrom()+File.separatorChar+String.valueOf(entity.getId()),filename);
         sendButton.setDisable(true);
     }
 
-    private void fillAtachmentListView(MessageEntity entity) {
-        
-        
-    }
 }
