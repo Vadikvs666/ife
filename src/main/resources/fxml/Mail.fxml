@@ -11,15 +11,17 @@
     <stylesheets>
         <URL value="@/styles/mail.css" />
     </stylesheets>
-   <children>
-      <TableView fx:id="mailTableView" layoutX="33.0" layoutY="27.0" onKeyPressed="#onMailSelect" onMouseClicked="#onMailSelect" prefHeight="200.0" prefWidth="200.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
-        <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
-        </columns>
-      </TableView>
-      <ListView fx:id="fileListView" layoutX="15.0" layoutY="227.0" onKeyPressed="#onFileSelect" onMouseClicked="#onFileSelect" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" />
-      <Button fx:id="exitButton" layoutX="891.0" layoutY="407.0" maxWidth="65.0" minWidth="65.0" mnemonicParsing="false" onAction="#onExitButton" text="Выход" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
-      <Button fx:id="sendButton" layoutX="810.0" layoutY="407.0" mnemonicParsing="false" onAction="#onSendButton" text="Отправить файл" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
-   </children>
+    <children>
+        <TableView fx:id="mailTableView" layoutX="33.0" layoutY="27.0" onKeyPressed="#onMailSelect" onMouseClicked="#onMailSelect" prefHeight="200.0" prefWidth="200.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+            <columns>
+                <!-- Колонки таблицы -->
+                <TableColumn prefWidth="250.0" text="Отправитель" fx:id="fromColumn" />
+                <TableColumn prefWidth="250.0" text="Тема" fx:id="subjectColumn" />
+                <TableColumn prefWidth="150.0" text="Дата" fx:id="dateColumn" />
+            </columns>
+        </TableView>
+        <ListView fx:id="fileListView" layoutX="15.0" layoutY="227.0" onKeyPressed="#onFileSelect" onMouseClicked="#onFileSelect" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" />
+        <Button fx:id="exitButton" layoutX="891.0" layoutY="407.0" maxWidth="65.0" minWidth="65.0" mnemonicParsing="false" onAction="#onExitButton" text="Выход" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
+        <Button fx:id="sendButton" layoutX="810.0" layoutY="407.0" mnemonicParsing="false" onAction="#onSendButton" text="Отправить файл" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
+    </children>
 </AnchorPane>
