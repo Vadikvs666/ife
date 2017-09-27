@@ -13,9 +13,11 @@ package vadikvs.ife;
 public class AtachmentEntity {
 
     private String filename;
+    private MessageEntity message;
     
-    public AtachmentEntity(String filename){
+    public AtachmentEntity(String filename,MessageEntity message){
         this.filename=filename;
+        this.message=message;
         
     }
     public String getFilename() {
@@ -25,6 +27,11 @@ public class AtachmentEntity {
     public void setFilename(String filename) {
         this.filename = filename;
     }
+    
+    public Integer getMessageId(){
+        return message.getId();
+    }
+    
     
 
     
