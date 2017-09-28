@@ -11,6 +11,8 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,6 +22,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javax.mail.Message;
 
@@ -45,6 +48,11 @@ public class MailController implements Initializable {
     private Button sendButton;
     @FXML
     private Button addButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button saveButton;
+
     @FXML
     private TableView<MessageEntity> mailTableView;
     @FXML
@@ -88,6 +96,8 @@ public class MailController implements Initializable {
         }
         sendButton.setDisable(true);
         addButton.setDisable(true);
+        deleteButton.setDisable(true);
+        saveButton.setDisable(true);
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         fromColumn.setCellValueFactory(new PropertyValueFactory<>("from"));
         subjectColumn.setCellValueFactory(new PropertyValueFactory<>("subject"));
@@ -143,8 +153,7 @@ public class MailController implements Initializable {
         String filename = fileListView.getSelectionModel().selectedItemProperty().getValue();
         MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
         if (atachData.size() > 0) {
-            if(filename!=null){
-                System.out.print("filename: "+filename);
+            if (filename != null) {
                 addButton.setDisable(false);
             }
         }
@@ -153,7 +162,32 @@ public class MailController implements Initializable {
 
     @FXML
     public void onAddFileSelect() {
+        AtachmentEntity entity = addedfileListView.getSelectionModel().getSelectedItem();
+        if (entity != null) {
+            deleteButton.setDisable(false);
+            saveButton.setDisable(false);
+        }
+    }
 
+    @FXML
+    public void onDeleteButton() {
+        deleteButton.setDisable(true);
+        AtachmentEntity entity = addedfileListView.getSelectionModel().getSelectedItem();
+        addData.remove(entity);
+    }
+
+    @FXML
+    public void onSaveButton() {
+        saveButton.setDisable(true);
+        DirectoryChooser fileChooser = new DirectoryChooser();
+        AtachmentEntity entity = addedfileListView.getSelectionModel().getSelectedItem();
+        fileChooser.setTitle("Cохранить вложение");
+        File file = fileChooser.showDialog(stage);
+        if (file != null) {         
+            String path=file.getPath();
+            entity.saveAtach(path);
+        }
+        
     }
 
     @FXML
@@ -168,8 +202,8 @@ public class MailController implements Initializable {
     public void setFirm(FirmEntity firm) {
         this.firm = firm;
     }
-    
-   public void onFirmChanged(FirmEntity firm) {
+
+    public void onFirmChanged(FirmEntity firm) {
         this.firm = firm;
         stage.setTitle(firm.getName());
     }

@@ -31,8 +31,15 @@ public class AtachmentEntity {
     public Integer getMessageId(){
         return message.getId();
     }
-    
-    
 
+    public MessageEntity getMessage() {
+        return message;
+    }
+    
+    public void saveAtach(String path){
+        message.saveAtachByFilename(path, filename);
+    }
+
+    
     
 }

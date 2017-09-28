@@ -30,6 +30,8 @@
                 <TableColumn prefWidth="200.0" text="Выбранные файлы:" fx:id="addColumn" />
             </columns>
         </TableView>
+        <Button fx:id="deleteButton" layoutX="891.0" layoutY="407.0" maxWidth="115.0" minWidth="115.0" mnemonicParsing="false" onAction="#onDeleteButton" text="Удалить" AnchorPane.bottomAnchor="185.0" AnchorPane.leftAnchor="510.0" />
+        <Button fx:id="saveButton" layoutX="891.0" layoutY="407.0" maxWidth="115.0" minWidth="115.0" mnemonicParsing="false" onAction="#onSaveButton" text="Сохранить" AnchorPane.bottomAnchor="155.0" AnchorPane.leftAnchor="510.0" />
         <Button fx:id="exitButton" layoutX="891.0" layoutY="407.0" maxWidth="65.0" minWidth="65.0" mnemonicParsing="false" onAction="#onExitButton" text="Выход" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
         <Button fx:id="sendButton" layoutX="810.0" layoutY="407.0" mnemonicParsing="false" onAction="#onSendButton" text="Отправить файл" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
     </children>
