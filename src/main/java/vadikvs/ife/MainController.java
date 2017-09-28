@@ -121,9 +121,14 @@ public class MainController implements Initializable {
         Settings settings = new Settings();
         String server = settings.getServer();
         String user = settings.getUser();
+        String db = settings.getFilePath();
         String password = settings.getPassword();
         try {
-            DataAccessor da = new DataAccessor("com.mysql.jdbc.Driver", "jdbc:mysql://dasnews.ru/prod", user, password);
+            String conString="jdbc:mysql://";
+            conString+=server;
+            conString+="/";
+            conString+=db;
+            DataAccessor da = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password);
             List<FirmEntity> list = da.getFirmList();
             idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
             nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));

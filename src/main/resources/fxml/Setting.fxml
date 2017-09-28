@@ -33,7 +33,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="Путь к файлу" />
+            <Label text="База данных" />
             <TextField fx:id="fileNameText" onKeyReleased="#setChanged" GridPane.columnIndex="1" />
             <TextField fx:id="userText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <TextField fx:id="passwordText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="2" />
@@ -51,8 +51,8 @@
             <TextField fx:id="protocolText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <TextField fx:id="portText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <TextField fx:id="emailText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-            <TextField fx:id="countText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="9" />
             <PasswordField fx:id="passwordMailText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+            <TextField fx:id="countText" onKeyReleased="#setChanged" GridPane.columnIndex="1" GridPane.rowIndex="9" />
          </children>
       </GridPane>
       <Button fx:id="closeButton" layoutX="499.0" layoutY="199.0" maxHeight="31.0" maxWidth="120.0" mnemonicParsing="false" onAction="#onCloseButton" prefHeight="31.0" prefWidth="120.0" text="Закрыть" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
