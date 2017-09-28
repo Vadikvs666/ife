@@ -11,8 +11,6 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 
-
-
 /**
  *
  * @author vadim
@@ -37,8 +35,8 @@ public class Email {
             Session session = Session.getInstance(properties, null);
             store = session.getStore(protocol);
             store.connect(host, Integer.valueOf(port), userName, password);
-        
-        } catch ( MessagingException ex) {
+
+        } catch (MessagingException ex) {
             Logger.getLogger(Email.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -49,10 +47,11 @@ public class Email {
         MailSSLSocketFactory socketFactory = null;
         try {
             socketFactory = new MailSSLSocketFactory();
+            String[] trustedHosts = {host};
+            socketFactory.setTrustedHosts(trustedHosts);
         } catch (GeneralSecurityException e) {
         }
-        String[] trustedHosts = {host};
-        socketFactory.setTrustedHosts(trustedHosts);
+
         Properties props = new Properties();
         props.put(String.format("mail.%s.host", protocol), host);
         props.put(String.format("mail.%s.port", protocol), port);
@@ -96,7 +95,5 @@ public class Email {
             Logger.getLogger(Email.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-   
 
 }

@@ -35,8 +35,8 @@ public class MessageUtility {
         String listAddress = "";
 
         if (address != null) {
-            for (int i = 0; i < address.length; i++) {
-                listAddress += address[i].toString() + ", ";
+            for (Address addres : address) {
+                listAddress += addres.toString() + ", ";
             }
         }
         if (listAddress.length() > 1) {

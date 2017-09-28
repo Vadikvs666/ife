@@ -5,6 +5,7 @@
  */
 package vadikvs.ife;
 
+import com.vadikvs.Signalslots.Slot;
 import java.io.File;
 import java.net.URL;
 import java.util.Date;
@@ -29,11 +30,15 @@ import javax.mail.Message;
  */
 public class MailController implements Initializable {
 
-    private ObservableList<MessageEntity> messageData = FXCollections.observableArrayList();
+    public Slot closeAction = new Slot(this, "onExitButton");
+    public Slot firmChanged = new Slot(this, "onFirmChanged");
+    private final ObservableList<MessageEntity> messageData = FXCollections.observableArrayList();
     private ObservableList<String> atachData = FXCollections.observableArrayList();
-    private ObservableList<AtachmentEntity> addData = FXCollections.observableArrayList();
+    private final ObservableList<AtachmentEntity> addData = FXCollections.observableArrayList();
     private Email email;
     private Stage stage;
+    private FirmEntity firm;
+
     @FXML
     private Button exitButton;
     @FXML
@@ -62,6 +67,9 @@ public class MailController implements Initializable {
 
     /**
      * Initializes the controller class.
+     *
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -79,11 +87,12 @@ public class MailController implements Initializable {
             messageData.add(entity);
         }
         sendButton.setDisable(true);
-        idColumn.setCellValueFactory(new PropertyValueFactory<MessageEntity, Integer>("id"));
-        fromColumn.setCellValueFactory(new PropertyValueFactory<MessageEntity, String>("from"));
-        subjectColumn.setCellValueFactory(new PropertyValueFactory<MessageEntity, String>("subject"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<MessageEntity, Date>("date"));
-        addColumn.setCellValueFactory(new PropertyValueFactory<AtachmentEntity, String>("filename"));
+        addButton.setDisable(true);
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        fromColumn.setCellValueFactory(new PropertyValueFactory<>("from"));
+        subjectColumn.setCellValueFactory(new PropertyValueFactory<>("subject"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        addColumn.setCellValueFactory(new PropertyValueFactory<>("filename"));
         mailTableView.setItems(messageData);
         mailTableView.setEditable(true);
         addedfileListView.setItems(addData);
@@ -117,17 +126,15 @@ public class MailController implements Initializable {
         boolean add = true;
         for (int i = 0; i < addData.size(); i++) {
             AtachmentEntity it = addData.get(i);
-            System.out.println(e.getFilename() + " " + it.getFilename());
-            System.out.println(e.getMessageId() + " " + it.getMessageId());
-            if ((Objects.equals(e.getMessageId(), it.getMessageId()))) {
-                if (e.getFilename().equals(it.getFilename())) {
-                    add = false;
-                }
+            if ((Objects.equals(e.getMessageId(), it.getMessageId()))
+                    && e.getFilename().equals(it.getFilename())) {
+                add = false;
             }
         }
         if (add) {
             addData.add(e);
         }
+        addButton.setDisable(true);
     }
 
     @FXML
@@ -135,7 +142,17 @@ public class MailController implements Initializable {
         //
         String filename = fileListView.getSelectionModel().selectedItemProperty().getValue();
         MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
-        addButton.setDisable(false);
+        if (atachData.size() > 0) {
+            if(filename!=null){
+                System.out.print("filename: "+filename);
+                addButton.setDisable(false);
+            }
+        }
+
+    }
+
+    @FXML
+    public void onAddFileSelect() {
 
     }
 
@@ -146,6 +163,15 @@ public class MailController implements Initializable {
         MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
         entity.saveAtachByFilename("/tmp/ife/atach/" + entity.getFrom() + File.separatorChar + String.valueOf(entity.getId()), filename);
         sendButton.setDisable(true);
+    }
+
+    public void setFirm(FirmEntity firm) {
+        this.firm = firm;
+    }
+    
+   public void onFirmChanged(FirmEntity firm) {
+        this.firm = firm;
+        stage.setTitle(firm.getName());
     }
 
 }

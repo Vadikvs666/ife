@@ -29,19 +29,20 @@ public class Utility {
      */
     public static boolean saveFile(InputStream stream, String filename, String path) {
         try {
-            BufferedInputStream in = new BufferedInputStream(stream);
-            BufferedOutputStream out = null;
-            byte[] buf = new byte[65535]; // буфер ввода/вывода
-            while (in.read(buf) != -1) {
-                File folder = new File(path);
-                if (!folder.exists()) {
-                    folder.mkdirs();
+            try (BufferedInputStream in = new BufferedInputStream(stream)) {
+                BufferedOutputStream out = null;
+                byte[] buf = new byte[65535]; // буфер ввода/вывода
+                while (in.read(buf) != -1) {
+                    File folder;
+                    folder = new File(path);
+                    if (!folder.exists()) {
+                        folder.mkdirs();
+                    }
+                    out = new BufferedOutputStream(new FileOutputStream(path + File.separatorChar + filename));
                 }
-                out = new BufferedOutputStream(new FileOutputStream(path + File.separatorChar + filename));
+                out.write(buf);
+                out.close();
             }
-            out.write(buf);
-            out.close();
-            in.close();
         } catch (IOException ex) {
             Logger.getLogger(Utility.class.getName()).log(Level.SEVERE, "Unable to save file", ex);
             return false;

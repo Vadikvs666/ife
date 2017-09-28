@@ -89,6 +89,7 @@ public class MessageEntity {
     private void getMessageData() {
             setId(MessageUtility.getId(message));
             setFrom(MessageUtility.getFrom(message));
+            setSubject(MessageUtility.getSubject(message));
             setDate(MessageUtility.getDate(message));
             setBody(MessageUtility.getBody(message));
             setAtach(FXCollections.

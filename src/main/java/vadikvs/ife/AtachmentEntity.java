@@ -13,7 +13,7 @@ package vadikvs.ife;
 public class AtachmentEntity {
 
     private String filename;
-    private MessageEntity message;
+    private final MessageEntity message;
     
     public AtachmentEntity(String filename,MessageEntity message){
         this.filename=filename;
