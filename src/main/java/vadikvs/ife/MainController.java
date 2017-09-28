@@ -1,6 +1,5 @@
 package vadikvs.ife;
 
-
 import com.vadikvs.Signalslots.Signal;
 import java.io.IOException;
 import java.net.URL;
@@ -22,12 +21,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-
-
 public class MainController implements Initializable {
+
     private ObservableList<FirmEntity> firmData = FXCollections.observableArrayList();
-    public Signal close=new Signal();
-    public Signal firmChanged=new Signal();
+    public Signal close = new Signal();
+    public Signal firmChanged = new Signal();
     @FXML
     private Button closeButton;
     @FXML
@@ -39,19 +37,20 @@ public class MainController implements Initializable {
     @FXML
     private TableView<FirmEntity> firmTableView;
     @FXML
-    private TableColumn<FirmEntity,Integer> idColumn;
+    private TableColumn<FirmEntity, Integer> idColumn;
     @FXML
-    private TableColumn<FirmEntity,String> nameColumn;
+    private TableColumn<FirmEntity, String> nameColumn;
+
     @FXML
     private void onCloseButton(ActionEvent event) {
-         close.emit();
-         Stage stage = (Stage) closeButton.getScene().getWindow();
-         stage.close();
+        close.emit();
+        Stage stage = (Stage) closeButton.getScene().getWindow();
+        stage.close();
     }
-    
+
     @FXML
-    private void onSettingsButton(){
-       try {
+    private void onSettingsButton() {
+        try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("/fxml/Setting.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
@@ -63,16 +62,16 @@ public class MainController implements Initializable {
             dialog.setScene(scene);
             SettingController controller = loader.getController();
             controller.setStage(dialog);
-            dialog.showAndWait();       
+            dialog.showAndWait();
         } catch (IOException e) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-           
-        } 
+
+        }
     }
-    
+
     @FXML
-    private void onImportButton(){
-       try {
+    private void onImportButton() {
+        try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("/fxml/Setting.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
@@ -84,23 +83,23 @@ public class MainController implements Initializable {
             dialog.setScene(scene);
             SettingController controller = loader.getController();
             controller.setStage(dialog);
-            dialog.showAndWait();       
+            dialog.showAndWait();
         } catch (IOException e) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-           
-        } 
+
+        }
     }
-    
+
     @FXML
-    private void onMailButton(){
-       try {
+    private void onMailButton() {
+        try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("/fxml/Mail.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
             Stage dialog = new Stage();
             Stage stage = (Stage) closeButton.getScene().getWindow();
             FirmEntity entity = firmTableView.getSelectionModel().selectedItemProperty().getValue();
-            dialog.setTitle("Выбрать счета для переделки фирмы: "+entity.getName());
+            dialog.setTitle("Выбрать счета для переделки фирмы: " + entity.getName());
             dialog.initOwner(stage);
             Scene scene = new Scene(page);
             dialog.setScene(scene);
@@ -109,34 +108,38 @@ public class MainController implements Initializable {
             controller.setFirm(entity);
             close.connect(controller.closeAction);
             firmChanged.connect(controller.firmChanged);
-            dialog.showAndWait();       
+            dialog.showAndWait();
         } catch (IOException e) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-           
-        } 
+
+        }
     }
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         Settings settings = new Settings();
-        String server= settings.getServer();
-        String user= settings.getUser();
-        String password= settings.getPassword();
-        DataAccessor da= new DataAccessor("com.mysql.jdbc.Driver", "jdbc:mysql://dasnews.ru/prod", user, password);
-        List<FirmEntity> list= da.getFirmList();
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        firmData=FXCollections.observableArrayList(list);
-        firmTableView.setItems(firmData);
-        firmTableView.getSelectionModel().select(0);
-        
-    } 
-    
-    public void onFirmSelect(){
+        String server = settings.getServer();
+        String user = settings.getUser();
+        String password = settings.getPassword();
+        try {
+            DataAccessor da = new DataAccessor("com.mysql.jdbc.Driver", "jdbc:mysql://dasnews.ru/prod", user, password);
+            List<FirmEntity> list = da.getFirmList();
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+            nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+            firmData = FXCollections.observableArrayList(list);
+            firmTableView.setItems(firmData);
+            firmTableView.getSelectionModel().select(0);
+        } catch (Exception ex) {
+
+        }
+
+    }
+
+    public void onFirmSelect() {
         FirmEntity entity = firmTableView.getSelectionModel().selectedItemProperty().getValue();
-        Object[] args={entity};
+        Object[] args = {entity};
         firmChanged.emit(args);
     }
-  
+
 }
