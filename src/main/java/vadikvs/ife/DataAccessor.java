@@ -51,7 +51,8 @@ public class DataAccessor {
     public ParamsEntity getParamsByFirmId(int id)  {
         try {
             ParamsEntity entity =null;
-            PreparedStatement st = connection.prepareStatement("select * from params_firm where firm=?");
+            PreparedStatement st = connection.prepareStatement(
+              "SELECT * FROM params_firm WHERE firm=? ORDER BY id DESC LIMIT 1");
             st.setString(1, String.valueOf(id));
             ResultSet result_set = st.executeQuery();       
             while (result_set.next()) {
