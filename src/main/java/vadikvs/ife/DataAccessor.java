@@ -52,7 +52,7 @@ public class DataAccessor {
         try {
             ParamsEntity entity =null;
             PreparedStatement st = connection.prepareStatement(
-              "SELECT * FROM params_firm WHERE firm=? ORDER BY id DESC LIMIT 1");
+              "SELECT * FROM params_excel WHERE firm=? ORDER BY id DESC LIMIT 1");
             st.setString(1, String.valueOf(id));
             ResultSet result_set = st.executeQuery();       
             while (result_set.next()) {
@@ -69,5 +69,29 @@ public class DataAccessor {
             Logger.getLogger(DataAccessor.class.getName()).log(Level.SEVERE, null, ex);
         } 
         return null;
+    }
+    
+    public boolean insertParams(ParamsEntity entity)  {
+        try {
+            
+            PreparedStatement st = connection.prepareStatement(
+              "INSERT INTO params_excel "
+                      + "(start_row,max_row,count_col,summ_col,articul_col,"
+                      + "number_col,number_row,firm) "
+                      + "VALUES(?,?,?,?,?,?,?,?)");
+            st.setInt(1, entity.getStart_row());
+            st.setInt(2, entity.getMax_row());
+            st.setInt(3, entity.getCount_col());
+            st.setInt(4, entity.getSumm_col());
+            st.setInt(5, entity.getArtikul_col());
+            st.setInt(6, 0);
+            st.setInt(7, 0);
+            st.setInt(8, entity.getFirm().getId());
+            return st.execute();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(DataAccessor.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        return false;
     }
 }

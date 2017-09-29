@@ -16,6 +16,15 @@ public class ParamsEntity {
     private int count_col;
     private int summ_col;
     private int artikul_col;
+    private FirmEntity firm;
+
+    public FirmEntity getFirm() {
+        return firm;
+    }
+
+    public void setFirm(FirmEntity firm) {
+        this.firm = firm;
+    }
 
     
     public ParamsEntity(int start_row, int max_row, int count_col, int summ_col, int artikul_col) {

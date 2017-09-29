@@ -198,6 +198,8 @@ public class MailController implements Initializable {
         entity.saveAtachByFilename("/tmp/ife/atach/" + entity.getFrom() + File.separatorChar + String.valueOf(entity.getId()), filename);
         sendButton.setDisable(true);
     }
+    
+    
 
     public void setFirm(FirmEntity firm) {
         this.firm = firm;

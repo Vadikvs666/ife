@@ -114,7 +114,12 @@ public class MainController implements Initializable {
 
         }
     }
-
+    
+    @FXML
+    private void onSaveParamButton(){
+        
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
