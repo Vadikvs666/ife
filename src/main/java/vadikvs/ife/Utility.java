@@ -50,4 +50,16 @@ public class Utility {
         return true;
     }
 
+    public static String getFileExtensions(File file) {
+        String extension = "";
+        String fileName=file.getName();
+        int i = fileName.lastIndexOf('.');
+        int p = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+
+        if (i > p) {
+            extension = fileName.substring(i + 1);
+        }
+        return extension;
+    }
+
 }
