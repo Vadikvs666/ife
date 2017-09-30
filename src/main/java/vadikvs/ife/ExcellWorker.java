@@ -14,54 +14,72 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
  * @author vadim
  */
 public class ExcellWorker {
+
     private File file;
+    HSSFWorkbook xlsBook;
+    XSSFWorkbook xlsxBook;
 
     public ExcellWorker(File file) {
-        this.file = file;
-    }
-    
-    public String[][] getSheet(){
-        String[][] sheet=new String[255][65000];
-        String ext=Utility.getFileExtensions(file);
-        switch(ext){
-            case "xls":
-                    sheet=getSheetfromXLS();
-                break;
-            case "xlsx":
-                    sheet=getSheetfromXLSX();
-                break;
-            default:
-                break;
-        }
-        return sheet;
-    }
-
-    private String getData(int row, int col) {
         try {
-            HSSFWorkbook myExcelBook = new HSSFWorkbook(new FileInputStream(file));
-            int index_sheet=myExcelBook.getActiveSheetIndex();
-            HSSFSheet myExcelSheet =myExcelBook.getSheetAt(index_sheet);
-            HSSFRow row = myExcelSheet.getRow(0);
-            String name = row.getCell(0).getStringCellValue();
- 
-            
-            myExcelBook.close();
-        } catch (FileNotFoundException   ex) {
-            Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
+            this.file = file;
+            String ext = Utility.getFileExtensions(file);
+            switch (ext) {
+                case "xls":
+                    xlsBook = new HSSFWorkbook(new FileInputStream(file));
+                    xlsxBook = null;
+                    break;
+                case "xlsx":
+                    xlsxBook = new XSSFWorkbook(new FileInputStream(file));
+                    xlsBook = null;
+                    break;
+                default:
+                    xlsBook = null;
+                    xlsxBook = null;
+                    break;
+            }
         } catch (IOException ex) {
             Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private String[][] getSheetfromXLSX() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  
+
+    public String getData(int row, int col) {
+        String data = "";
+        if(xlsBook!=null){
+            data = getDatafromXLS(row, col);
+        }else{
+            data =getDatafromXLSX(row, col);
+        }
+        return data;
     }
     
-    
+
+    private String getDatafromXLSX(int row, int col) {
+        String data = "";
+        int index_sheet = xlsxBook.getActiveSheetIndex();
+        XSSFSheet myExcelSheet = xlsxBook.getSheetAt(index_sheet);
+        XSSFRow rowH = myExcelSheet.getRow(0);
+        data = rowH.getCell(0).getStringCellValue();
+        return data;
+    }
+
+    private String getDatafromXLS(int row, int col) {
+        String data = "";
+        int index_sheet = xlsBook.getActiveSheetIndex();
+        HSSFSheet myExcelSheet = xlsBook.getSheetAt(index_sheet);
+        HSSFRow rowH = myExcelSheet.getRow(0);
+        data = rowH.getCell(0).getStringCellValue();
+        return data;
+    }
+
 }
