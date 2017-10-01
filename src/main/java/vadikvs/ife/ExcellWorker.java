@@ -66,13 +66,17 @@ public class ExcellWorker {
         String data = "";
         int index_sheet = xlsxBook.getActiveSheetIndex();
         XSSFSheet myExcelSheet = xlsxBook.getSheetAt(index_sheet);
-        XSSFRow rowH = myExcelSheet.getRow(row);
-        XSSFCell cell = rowH.getCell(col);
-        if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
-            data = cell.getStringCellValue();
-        }
-        if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
-            data = String.valueOf(cell.getNumericCellValue());
+        XSSFRow rowH = myExcelSheet.getRow(row - 1);
+        if (rowH != null) {
+            XSSFCell cell = rowH.getCell(col - 1);
+            if (cell != null) {
+                if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
+                    data = cell.getStringCellValue();
+                }
+                if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
+                    data = String.valueOf(cell.getNumericCellValue());
+                }
+            }
         }
         return data;
     }
@@ -84,7 +88,6 @@ public class ExcellWorker {
         HSSFRow rowH = myExcelSheet.getRow(row - 1);
         if (rowH != null) {
             HSSFCell cell = rowH.getCell(col - 1);
-            System.out.println("row: " + String.valueOf(row - 1) + " col: " + String.valueOf(col - 1));
             if (cell != null) {
                 if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
                     data = cell.getStringCellValue();
