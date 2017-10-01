@@ -10,6 +10,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -28,6 +32,7 @@ public class ExcellWorker {
     private File file;
     HSSFWorkbook xlsBook;
     XSSFWorkbook xlsxBook;
+    Workbook jxlsBook;
 
     public ExcellWorker(File file) {
         try {
@@ -35,7 +40,8 @@ public class ExcellWorker {
             String ext = Utility.getFileExtensions(file);
             switch (ext) {
                 case "xls":
-                    xlsBook = new HSSFWorkbook(new FileInputStream(file));
+                    // xlsBook = new HSSFWorkbook(new FileInputStream(file));
+                    jxlsBook = Workbook.getWorkbook(file);
                     xlsxBook = null;
                     break;
                 case "xlsx":
@@ -49,13 +55,15 @@ public class ExcellWorker {
             }
         } catch (IOException ex) {
             Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (BiffException ex) {
+            Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public String getData(int row, int col) {
         String data = "";
-        if (xlsBook != null) {
-            data = getDatafromXLS(row, col);
+        if (jxlsBook != null) {
+            data = getDatafromJXLS(row, col);
         } else {
             data = getDatafromXLSX(row, col);
         }
@@ -95,6 +103,18 @@ public class ExcellWorker {
                 if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
                     data = String.valueOf(cell.getNumericCellValue());
                 }
+            }
+        }
+        return data;
+    }
+
+    private String getDatafromJXLS(int row, int col) {
+        String data = "";
+        Sheet sheet = jxlsBook.getSheet(0);
+        if (row - 1 < sheet.getRows()) {
+            if (col - 1 <  sheet.getColumns()) {
+                Cell cell = sheet.getCell(col - 1, row - 1);
+                data = cell.getContents();
             }
         }
         return data;

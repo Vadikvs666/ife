@@ -8,7 +8,9 @@ package vadikvs.ife;
 import com.vadikvs.Signalslots.Slot;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -78,8 +80,6 @@ public class MailController implements Initializable {
     @FXML
     private TableColumn<AtachmentEntity, String> addColumn;
     private Settings settings;
-
-    
 
     /**
      * Initializes the controller class.
@@ -185,7 +185,7 @@ public class MailController implements Initializable {
         saveButton.setDisable(true);
         AtachmentEntity entity = addedfileListView.getSelectionModel().getSelectedItem();
         addData.remove(entity);
-        if (addData.size()<=0){
+        if (addData.size() <= 0) {
             sendButton.setDisable(true);
         }
     }
@@ -206,10 +206,13 @@ public class MailController implements Initializable {
 
     @FXML
     public void onSendButton() {
-        //
-        AtachmentEntity entity = addData.get(0);
-        DataExtractor DE=new DataExtractor(entity, param);
-        DE.getProductsFromFile(settings.getTempPath());
+        List<ProductEntity> products = new ArrayList<>();
+        for (int i = 0; i < addData.size(); i++) {
+            AtachmentEntity entity = addData.get(i);
+            DataExtractor DE = new DataExtractor(entity, param);
+            products.addAll(DE.getProductsFromFile(settings.getTempPath()));
+        }
+        System.out.print(String.valueOf(products.size()));
         sendButton.setDisable(true);
     }
 
