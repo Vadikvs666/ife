@@ -21,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -72,6 +73,8 @@ public class MailController implements Initializable {
     @FXML
     private TableColumn<AtachmentEntity, String> addColumn;
     private Settings settings;
+
+    
 
     /**
      * Initializes the controller class.
@@ -183,11 +186,11 @@ public class MailController implements Initializable {
         AtachmentEntity entity = addedfileListView.getSelectionModel().getSelectedItem();
         fileChooser.setTitle("Cохранить вложение");
         File file = fileChooser.showDialog(stage);
-        if (file != null) {         
-            String path=file.getPath();
+        if (file != null) {
+            String path = file.getPath();
             entity.saveAtach(path);
         }
-        
+
     }
 
     @FXML
@@ -198,8 +201,6 @@ public class MailController implements Initializable {
         entity.saveAtachByFilename("/tmp/ife/atach/" + entity.getFrom() + File.separatorChar + String.valueOf(entity.getId()), filename);
         sendButton.setDisable(true);
     }
-    
-    
 
     public void setFirm(FirmEntity firm) {
         this.firm = firm;

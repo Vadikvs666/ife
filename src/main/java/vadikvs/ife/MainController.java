@@ -17,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -26,6 +27,7 @@ public class MainController implements Initializable {
     private ObservableList<FirmEntity> firmData = FXCollections.observableArrayList();
     public Signal close = new Signal();
     public Signal firmChanged = new Signal();
+    private DataAccessor DA;
     @FXML
     private Button closeButton;
     @FXML
@@ -35,11 +37,27 @@ public class MainController implements Initializable {
     @FXML
     private Button mailButton;
     @FXML
+    private Button saveParamButton;
+    @FXML
     private TableView<FirmEntity> firmTableView;
     @FXML
     private TableColumn<FirmEntity, Integer> idColumn;
     @FXML
     private TableColumn<FirmEntity, String> nameColumn;
+    @FXML
+    private TextField artikulColTextEdit;
+    @FXML
+    private TextField summColTextEdit;
+    @FXML
+    private TextField countColTextEdit;
+    @FXML
+    private TextField nameColTextEdit;
+    @FXML
+    private TextField startRowTextEdit;
+    @FXML
+    private TextField numberColTextEdit;
+    @FXML
+    private TextField numberRowTextEdit;
 
     @FXML
     private void onCloseButton(ActionEvent event) {
@@ -114,12 +132,28 @@ public class MainController implements Initializable {
 
         }
     }
-    
+
     @FXML
-    private void onSaveParamButton(){
-        
+    private void onSaveParamButton() {
+        Settings settings = new Settings();
+        String server = settings.getServer();
+        String user = settings.getUser();
+        String db = settings.getFilePath();
+        String password = settings.getPassword();
+        FirmEntity firm = firmTableView.getSelectionModel().selectedItemProperty().getValue();
+        ParamsEntity entity = new ParamsEntity(startRowTextEdit.getText(), "0", countColTextEdit.getText(),
+                summColTextEdit.getText(), artikulColTextEdit.getText(),
+                nameColTextEdit.getText(), numberColTextEdit.getText(),
+                numberRowTextEdit.getText(), firm.getId());
+        DA.insertParams(entity);
+        saveParamButton.setText("Сохранить");
     }
-    
+
+    @FXML
+    public void paramsChanged() {
+        saveParamButton.setText("Сохранить*");
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
@@ -129,17 +163,18 @@ public class MainController implements Initializable {
         String db = settings.getFilePath();
         String password = settings.getPassword();
         try {
-            String conString="jdbc:mysql://";
-            conString+=server;
-            conString+="/";
-            conString+=db;
-            DataAccessor da = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password);
-            List<FirmEntity> list = da.getFirmList();
+            String conString = "jdbc:mysql://";
+            conString += server;
+            conString += "/";
+            conString += db;
+            this.DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password);
+            List<FirmEntity> list = DA.getFirmList();
             idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
             nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
             firmData = FXCollections.observableArrayList(list);
             firmTableView.setItems(firmData);
             firmTableView.getSelectionModel().select(0);
+            onFirmSelect();
         } catch (Exception ex) {
 
         }
@@ -147,9 +182,29 @@ public class MainController implements Initializable {
     }
 
     public void onFirmSelect() {
+        clearParamsTextFields();
         FirmEntity entity = firmTableView.getSelectionModel().selectedItemProperty().getValue();
         Object[] args = {entity};
         firmChanged.emit(args);
+        ParamsEntity params = DA.getParamsByFirmId(entity.getId());
+        startRowTextEdit.setText(params.getStart_rowString());
+        numberColTextEdit.setText(params.getNumber_colString());
+        numberRowTextEdit.setText(params.getNumber_rowString());
+        nameColTextEdit.setText(params.getName_colString());
+        countColTextEdit.setText(params.getCount_colString());
+        summColTextEdit.setText(params.getSumm_colString());
+        artikulColTextEdit.setText(params.getArtikul_colString());
+
+    }
+
+    private void clearParamsTextFields() {
+        startRowTextEdit.setText("");
+        numberColTextEdit.setText("");
+        numberRowTextEdit.setText("");
+        nameColTextEdit.setText("");
+        countColTextEdit.setText("");
+        summColTextEdit.setText("");
+        artikulColTextEdit.setText("");
     }
 
 }

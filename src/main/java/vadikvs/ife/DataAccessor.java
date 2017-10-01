@@ -60,9 +60,13 @@ public class DataAccessor {
                 int max_row = result_set.getInt("max_row");
                 int count_col = result_set.getInt("count_col");
                 int summ_col = result_set.getInt("summ_col");
-                int artikul_col = result_set.getInt("artikul_col");
+                int artikul_col = result_set.getInt("articul_col");
+                int name_col = result_set.getInt("name_col");
+                int number_col = result_set.getInt("number_col");
+                int number_row = result_set.getInt("number_row");
                 entity =new ParamsEntity(start_row, max_row, 
-                                                count_col, summ_col, artikul_col);
+                                                count_col, summ_col,artikul_col, 
+                                        name_col,number_col,number_row,id);
             }
             return entity ;
         } catch (SQLException ex) {
@@ -77,16 +81,17 @@ public class DataAccessor {
             PreparedStatement st = connection.prepareStatement(
               "INSERT INTO params_excel "
                       + "(start_row,max_row,count_col,summ_col,articul_col,"
-                      + "number_col,number_row,firm) "
-                      + "VALUES(?,?,?,?,?,?,?,?)");
+                      + "number_col,number_row,firm,name_col) "
+                      + "VALUES(?,?,?,?,?,?,?,?,?)");
             st.setInt(1, entity.getStart_row());
             st.setInt(2, entity.getMax_row());
             st.setInt(3, entity.getCount_col());
             st.setInt(4, entity.getSumm_col());
             st.setInt(5, entity.getArtikul_col());
-            st.setInt(6, 0);
-            st.setInt(7, 0);
-            st.setInt(8, entity.getFirm().getId());
+            st.setInt(6, entity.getNumber_col());
+            st.setInt(7, entity.getNumber_row());
+            st.setInt(8, entity.getFirm());
+            st.setInt(9, entity.getName_col());
             return st.execute();
             
         } catch (SQLException ex) {
