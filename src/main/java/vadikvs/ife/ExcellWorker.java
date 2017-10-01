@@ -14,6 +14,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -51,25 +52,28 @@ public class ExcellWorker {
         }
     }
 
-  
-
     public String getData(int row, int col) {
         String data = "";
-        if(xlsBook!=null){
+        if (xlsBook != null) {
             data = getDatafromXLS(row, col);
-        }else{
-            data =getDatafromXLSX(row, col);
+        } else {
+            data = getDatafromXLSX(row, col);
         }
         return data;
     }
-    
 
     private String getDatafromXLSX(int row, int col) {
         String data = "";
         int index_sheet = xlsxBook.getActiveSheetIndex();
         XSSFSheet myExcelSheet = xlsxBook.getSheetAt(index_sheet);
-        XSSFRow rowH = myExcelSheet.getRow(0);
-        data = rowH.getCell(0).getStringCellValue();
+        XSSFRow rowH = myExcelSheet.getRow(row);
+        XSSFCell cell = rowH.getCell(col);
+        if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
+            data = cell.getStringCellValue();
+        }
+        if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
+            data = String.valueOf(cell.getNumericCellValue());
+        }
         return data;
     }
 
@@ -77,8 +81,19 @@ public class ExcellWorker {
         String data = "";
         int index_sheet = xlsBook.getActiveSheetIndex();
         HSSFSheet myExcelSheet = xlsBook.getSheetAt(index_sheet);
-        HSSFRow rowH = myExcelSheet.getRow(0);
-        data = rowH.getCell(0).getStringCellValue();
+        HSSFRow rowH = myExcelSheet.getRow(row - 1);
+        if (rowH != null) {
+            HSSFCell cell = rowH.getCell(col - 1);
+            System.out.println("row: " + String.valueOf(row - 1) + " col: " + String.valueOf(col - 1));
+            if (cell != null) {
+                if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
+                    data = cell.getStringCellValue();
+                }
+                if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                    data = String.valueOf(cell.getNumericCellValue());
+                }
+            }
+        }
         return data;
     }
 

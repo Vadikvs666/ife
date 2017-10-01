@@ -58,7 +58,8 @@ public class MainController implements Initializable {
     private TextField numberColTextEdit;
     @FXML
     private TextField numberRowTextEdit;
-
+    @FXML
+    private TextField maxRowTextFiled;
     @FXML
     private void onCloseButton(ActionEvent event) {
         close.emit();
@@ -116,14 +117,15 @@ public class MainController implements Initializable {
             AnchorPane page = (AnchorPane) loader.load();
             Stage dialog = new Stage();
             Stage stage = (Stage) closeButton.getScene().getWindow();
-            FirmEntity entity = firmTableView.getSelectionModel().selectedItemProperty().getValue();
-            dialog.setTitle("Выбрать счета для переделки фирмы: " + entity.getName());
+            FirmEntity firm= firmTableView.getSelectionModel().selectedItemProperty().getValue();
+            dialog.setTitle("Выбрать счета для переделки фирмы: " + firm.getName());
             dialog.initOwner(stage);
             Scene scene = new Scene(page);
             dialog.setScene(scene);
             MailController controller = loader.getController();
             controller.setStage(dialog);
-            controller.setFirm(entity);
+            controller.setFirm(firm);
+            controller.setParam(DA.getParamsByFirmId(firm.getId()));
             close.connect(controller.closeAction);
             firmChanged.connect(controller.firmChanged);
             dialog.showAndWait();
@@ -141,7 +143,7 @@ public class MainController implements Initializable {
         String db = settings.getFilePath();
         String password = settings.getPassword();
         FirmEntity firm = firmTableView.getSelectionModel().selectedItemProperty().getValue();
-        ParamsEntity entity = new ParamsEntity(startRowTextEdit.getText(), "0", countColTextEdit.getText(),
+        ParamsEntity entity = new ParamsEntity(startRowTextEdit.getText(), maxRowTextFiled.getText(), countColTextEdit.getText(),
                 summColTextEdit.getText(), artikulColTextEdit.getText(),
                 nameColTextEdit.getText(), numberColTextEdit.getText(),
                 numberRowTextEdit.getText(), firm.getId());
@@ -194,6 +196,7 @@ public class MainController implements Initializable {
         countColTextEdit.setText(params.getCount_colString());
         summColTextEdit.setText(params.getSumm_colString());
         artikulColTextEdit.setText(params.getArtikul_colString());
+        maxRowTextFiled.setText(params.getMax_rowString());
 
     }
 
@@ -205,6 +208,7 @@ public class MainController implements Initializable {
         countColTextEdit.setText("");
         summColTextEdit.setText("");
         artikulColTextEdit.setText("");
+        maxRowTextFiled.setText("");
     }
 
 }

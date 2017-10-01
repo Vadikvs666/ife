@@ -42,6 +42,11 @@ public class MailController implements Initializable {
     private Email email;
     private Stage stage;
     private FirmEntity firm;
+    private ParamsEntity param;
+
+    public void setParam(ParamsEntity param) {
+        this.param = param;
+    }
 
     @FXML
     private Button exitButton;
@@ -148,6 +153,7 @@ public class MailController implements Initializable {
             addData.add(e);
         }
         addButton.setDisable(true);
+        sendButton.setDisable(false);
     }
 
     @FXML
@@ -169,14 +175,19 @@ public class MailController implements Initializable {
         if (entity != null) {
             deleteButton.setDisable(false);
             saveButton.setDisable(false);
+            sendButton.setDisable(false);
         }
     }
 
     @FXML
     public void onDeleteButton() {
         deleteButton.setDisable(true);
+        saveButton.setDisable(true);
         AtachmentEntity entity = addedfileListView.getSelectionModel().getSelectedItem();
         addData.remove(entity);
+        if (addData.size()<=0){
+            sendButton.setDisable(true);
+        }
     }
 
     @FXML
@@ -196,9 +207,9 @@ public class MailController implements Initializable {
     @FXML
     public void onSendButton() {
         //
-        String filename = fileListView.getSelectionModel().selectedItemProperty().getValue();
-        MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
-        entity.saveAtachByFilename("/tmp/ife/atach/" + entity.getFrom() + File.separatorChar + String.valueOf(entity.getId()), filename);
+        AtachmentEntity entity = addData.get(0);
+        DataExtractor DE=new DataExtractor(entity, param);
+        DE.getProductsFromFile(settings.getTempPath());
         sendButton.setDisable(true);
     }
 

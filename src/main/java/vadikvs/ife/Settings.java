@@ -17,6 +17,16 @@ import javafx.beans.property.StringProperty;
 public class Settings {
 
     private StringProperty filePath;
+    private StringProperty tempPath;
+
+    public String getTempPath() {
+        return tempPath.get();
+    }
+
+    public void setTempPath(String tempPath) {
+        this.tempPath.set(tempPath);
+        save();
+    }
     private StringProperty user;
     private StringProperty password;
     private StringProperty server;
@@ -135,6 +145,7 @@ public class Settings {
         prefs.put("portMail", getPortMail());
         prefs.put("userPassword", getUserPassword());
         prefs.put("countMail", getCountMail());
+        prefs.put("tempPath", getTempPath());
     }
 
     private Boolean load() {
@@ -149,6 +160,7 @@ public class Settings {
         String portMailS =prefs.get("portMail", null);
         String userPasswordS =prefs.get("userPassword", null);
         String countMailS =prefs.get("countMail", null);
+        String tempPathS =prefs.get("tempPath", null);
         if (file != null 
                 && user != null 
                 && pass != null
@@ -158,7 +170,8 @@ public class Settings {
                 && userMailS != null
                 && portMailS != null
                 && userPasswordS != null
-                && countMailS!= null) {
+                && countMailS!= null
+                && tempPathS!= null) {
             setUser(user);
             setFilePath(file);
             setPassword(pass);
@@ -169,6 +182,7 @@ public class Settings {
             setUserMail(userMailS);
             setUserPassword(userPasswordS);
             setCountMail(countMailS);
+            setTempPath(tempPathS);
             return true;
         } else {
             return false;
@@ -187,11 +201,12 @@ public class Settings {
         password = new SimpleStringProperty("");
         server =new SimpleStringProperty("");
         serverMail=new SimpleStringProperty("");
-        protocolMail=new SimpleStringProperty("");
-        portMail=new SimpleStringProperty("");
+        protocolMail=new SimpleStringProperty("imap");
+        portMail=new SimpleStringProperty("993");
         userMail=new SimpleStringProperty("");
         userPassword=new SimpleStringProperty("");
         countMail=new SimpleStringProperty("0");
+        tempPath = new SimpleStringProperty("temp");
     }
 
 }

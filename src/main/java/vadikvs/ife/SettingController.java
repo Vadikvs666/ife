@@ -48,6 +48,8 @@ public class SettingController implements Initializable {
     @FXML
     private TextField countText;
     @FXML
+    private TextField tempPathText;
+    @FXML
     private PasswordField passwordMailText;
     private Stage stage;
     private Settings settings;
@@ -67,6 +69,7 @@ public class SettingController implements Initializable {
         settings.setUserMail(emailText.getText());
         settings.setUserPassword(passwordMailText.getText());
         settings.setCountMail(countText.getText());
+        settings.setTempPath(tempPathText.getText());
     }
     @FXML
     protected void onResetButton(){
@@ -109,7 +112,7 @@ public class SettingController implements Initializable {
         emailText.setText(settings.getUserMail());
         countText.setText(settings.getCountMail());
         passwordMailText.setText(settings.getUserPassword());
-        
+        tempPathText.setText(settings.getTempPath());
         
     }
     
