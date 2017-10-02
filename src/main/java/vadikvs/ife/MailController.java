@@ -7,6 +7,10 @@ package vadikvs.ife;
 
 import com.vadikvs.Signalslots.Slot;
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -223,6 +227,17 @@ public class MailController implements Initializable {
     public void onFirmChanged(FirmEntity firm) {
         this.firm = firm;
         stage.setTitle(firm.getName());
+    }
+
+    private void openBrowser(String url) {
+        try {
+            URI u = new URI(url);
+            java.awt.Desktop.getDesktop().browse(u);
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(MailController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException | IOException ex) {
+            Logger.getLogger(MailController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }
