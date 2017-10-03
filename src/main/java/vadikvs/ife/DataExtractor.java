@@ -39,8 +39,12 @@ public class DataExtractor {
             String count = excell.getData(row, count_col);
             String summ = excell.getData(row, summ_col);
             if(count!=""){
-                System.out.println("artikul: "+artikul+"name :"+name+"count: "+count+"summ: "+summ);
-                ProductEntity entity = new ProductEntity(artikul, name, count, summ);
+                System.out.println("artikul: "+artikul+" name :"+name+" count: "+count+" summ: "+summ);
+                String preparedSumm=Utility.prepareNumeric(summ);
+                
+                ProductEntity entity = new ProductEntity(artikul, name, 
+                        Utility.prepareNumeric(count), 
+                        preparedSumm);
                 list.add(entity);
             }
         }

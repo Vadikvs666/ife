@@ -22,18 +22,19 @@ public class ProductEntity {
     }
     
     public ProductEntity(String articul, String name, String count, String summ) {
-        try{
+        
         this.articul = articul;
         this.name = name;
         float temp=Float.valueOf(count);
         float summ_f =Float.valueOf(summ);
         this.count = Math.round(temp);
         this.price = summ_f/this.count;
-        }
-        catch(Exception ex){
-            this.count=0;
-            this.price=0;
-        }
+        
+       
+            
+          //  this.count=0;
+           // this.price=0;
+       
     }
 
     public String getArticul() {

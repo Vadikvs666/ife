@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jxl.Cell;
@@ -114,7 +115,11 @@ public class ExcellWorker {
         if (row - 1 < sheet.getRows()) {
             if (col - 1 <  sheet.getColumns()) {
                 Cell cell = sheet.getCell(col - 1, row - 1);
-                data = cell.getContents();
+                try {
+                    data = cell.getContents().getBytes("utf-8").toString();
+                } catch (UnsupportedEncodingException ex) {
+                    Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         return data;

@@ -24,7 +24,7 @@ public class RequestMaker {
     }
     
     public String getStringRequest(){
-        String request="http://"+server+"/?";
+        String request="http://"+server+"/admin/inputdocs/manual"+"?";
         for(ProductEntity entity:list){
             request+="products[]=";
             request+=getJSONString(entity);

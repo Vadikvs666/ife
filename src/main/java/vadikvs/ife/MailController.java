@@ -212,7 +212,8 @@ public class MailController implements Initializable {
             DataExtractor DE = new DataExtractor(entity, param);
             products.addAll(DE.getProductsFromFile(settings.getTempPath()));
         }
-        System.out.print(String.valueOf(products.size()));
+        RequestMaker req=new RequestMaker(products, settings.getServer(), "30");
+        System.out.println(req.getStringRequest());
         sendButton.setDisable(true);
     }
 

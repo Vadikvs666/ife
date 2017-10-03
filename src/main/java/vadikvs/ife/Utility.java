@@ -52,7 +52,7 @@ public class Utility {
 
     public static String getFileExtensions(File file) {
         String extension = "";
-        String fileName=file.getName();
+        String fileName = file.getName();
         int i = fileName.lastIndexOf('.');
         int p = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
 
@@ -60,6 +60,22 @@ public class Utility {
             extension = fileName.substring(i + 1);
         }
         return extension;
+    }
+
+    public static String prepareNumeric(String data) {
+        String res = "";
+        System.out.println(String.valueOf((int)' '));
+        for( int i=0;i<data.length();i++){
+            char f=data.charAt(i);
+            System.out.println(String.valueOf((int)f));
+           // if(data.charAt(i)!=' '&&data.charAt(i)!=' ')
+           if((int)data.charAt(i)!=160&&(int)data.charAt(i)!=32){
+                res=res+data.charAt(i);
+                System.out.println(res+"|");
+            }
+        }
+        System.out.println(res);
+        return res.replace(",", ".");
     }
 
 }
