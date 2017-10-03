@@ -4,7 +4,11 @@
  */
 package vadikvs.ife;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 
 /**
@@ -24,14 +28,23 @@ public class RequestMaker {
     }
     
     public String getStringRequest(){
-        String request="http://"+server+"/admin/inputdocs/manual"+"?";
+        String start=server+"/admin/inputdocs/manual"+"?";
+        String request="";
         for(ProductEntity entity:list){
             request+="products[]=";
             request+=getJSONString(entity);
             request+="&";
         }
+        
         request+="addition="+addition;
-        return request;
+        String res="";
+        try {
+            res=new URI("http", server, "/admin/inputdocs/manual", request, "").toString();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(RequestMaker.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println(res);
+        return res;
     }
     
     private String getJSONString(ProductEntity product){

@@ -115,11 +115,7 @@ public class ExcellWorker {
         if (row - 1 < sheet.getRows()) {
             if (col - 1 <  sheet.getColumns()) {
                 Cell cell = sheet.getCell(col - 1, row - 1);
-                try {
-                    data = cell.getContents().getBytes("utf-8").toString();
-                } catch (UnsupportedEncodingException ex) {
-                    Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                data = cell.getContents();
             }
         }
         return data;

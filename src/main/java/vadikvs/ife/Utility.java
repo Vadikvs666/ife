@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,18 +66,23 @@ public class Utility {
 
     public static String prepareNumeric(String data) {
         String res = "";
-        System.out.println(String.valueOf((int)' '));
-        for( int i=0;i<data.length();i++){
-            char f=data.charAt(i);
-            System.out.println(String.valueOf((int)f));
-           // if(data.charAt(i)!=' '&&data.charAt(i)!=' ')
-           if((int)data.charAt(i)!=160&&(int)data.charAt(i)!=32){
-                res=res+data.charAt(i);
-                System.out.println(res+"|");
+        for (int i = 0; i < data.length(); i++) {
+            if ((int) data.charAt(i) != 160 && (int) data.charAt(i) != 32) {
+                res = res + data.charAt(i);
             }
         }
-        System.out.println(res);
         return res.replace(",", ".");
+    }
+    
+    public static String encodeUrl(String url){
+        String uri="";
+        try {
+            uri = URLEncoder.encode(url,"utf-8");
+            
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Utility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return uri;
     }
 
 }

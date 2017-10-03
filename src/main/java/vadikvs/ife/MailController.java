@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -216,8 +217,9 @@ public class MailController implements Initializable {
             DataExtractor DE = new DataExtractor(entity, param);
             products.addAll(DE.getProductsFromFile(settings.getTempPath()));
         }
-        RequestMaker req=new RequestMaker(products, settings.getServer(), "30");
-        System.out.println(req.getStringRequest());
+        RequestMaker req = new RequestMaker(products, settings.getServer(), "30");
+        BrowserLauncher bl= new BrowserLauncher();
+        bl.openBrowser(req.getStringRequest());
         sendButton.setDisable(true);
     }
 
@@ -233,6 +235,7 @@ public class MailController implements Initializable {
     private void openBrowser(String url) {
         try {
             URI u = new URI(url);
+            System.out.println(u.toString());
             java.awt.Desktop.getDesktop().browse(u);
         } catch (MalformedURLException ex) {
             Logger.getLogger(MailController.class.getName()).log(Level.SEVERE, null, ex);
