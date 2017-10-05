@@ -5,6 +5,7 @@
  */
 package vadikvs.ife;
 
+import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 import javafx.beans.property.SimpleStringProperty;
@@ -90,7 +91,7 @@ public class Settings {
     private StringProperty userMail;
     private StringProperty userPassword;
     private StringProperty portMail;
-    private Map<String,String> settings;
+    private SettingList settings;
 
     public String getPassword() {
         return password.get();
@@ -194,6 +195,21 @@ public class Settings {
         init();
         save();
     }
+    
+    public String getValue(String name){
+       Preferences prefs = Preferences.userNodeForPackage(MainApp.class);
+       return prefs.get(name, "");
+    }
+    
+    public boolean setValue(String name , String value){
+       Preferences prefs = Preferences.userNodeForPackage(MainApp.class);
+       if(settings.setValue(name, value)){
+           prefs.put(name, value);
+           return true;
+       }
+       return false;
+    }
+    
 
     private void init() {
         filePath = new SimpleStringProperty("");
@@ -207,6 +223,10 @@ public class Settings {
         userPassword=new SimpleStringProperty("");
         countMail=new SimpleStringProperty("0");
         tempPath = new SimpleStringProperty("temp");
+        settings =new SettingList();
+        Setting db =new Setting("database", "База данных", "");
+        settings.add(db);
+        
     }
 
 }
