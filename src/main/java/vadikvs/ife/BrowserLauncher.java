@@ -32,13 +32,13 @@ public class BrowserLauncher {
         }
     }
 
-    public void openBrowser(String url) {
+    public void openBrowser(String url, String browser) {
         switch(os){
             case  "win":
-                runWinBrowser(url);
+                runWinBrowser(url,browser);
                 break;
             case "nix":
-                runNixBrowser(url);
+                runNixBrowser(url,browser);
                 break;
             case "mac":
                 runMacBrowser(url);
@@ -48,10 +48,10 @@ public class BrowserLauncher {
         }
     }
 
-    private void runWinBrowser(String url) {
+    private void runWinBrowser(String url,String browser) {
         try {
             Runtime rt = Runtime.getRuntime();
-            rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+            rt.exec("browser " + url);
         } catch (IOException ex) {
             Logger.getLogger(BrowserLauncher.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -66,14 +66,15 @@ public class BrowserLauncher {
         }
     }
     
-    private void runNixBrowser(String url) {
+    private void runNixBrowser(String url,String browser) {
         try {
             Runtime rt = Runtime.getRuntime();
             StringBuffer cmd = new StringBuffer();
-            cmd.append(String.format("%s \"%s\"", "google-chrome", url));
+            cmd.append(String.format("%s \"%s\"", browser, url));
             rt.exec(new String[] { "sh", "-c", cmd.toString() });
         } catch (Exception ex) {
             Logger.getLogger(BrowserLauncher.class.getName()).log(Level.SEVERE, null, ex);
+            
         } 
     }
 
