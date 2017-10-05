@@ -178,7 +178,7 @@ public class MainController implements Initializable {
             firmTableView.getSelectionModel().select(0);
             onFirmSelect();
         } catch (Exception ex) {
-
+           // onSaveParamButton();
         }
 
     }
