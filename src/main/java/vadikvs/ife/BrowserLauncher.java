@@ -51,7 +51,7 @@ public class BrowserLauncher {
     private void runWinBrowser(String url,String browser) {
         try {
             Runtime rt = Runtime.getRuntime();
-            rt.exec("browser " + url);
+            rt.exec(browser+" " + url);
         } catch (IOException ex) {
             Logger.getLogger(BrowserLauncher.class.getName()).log(Level.SEVERE, null, ex);
         }
