@@ -70,7 +70,7 @@ public class MainController implements Initializable {
     @FXML
     private void onSettingsButton() {
         try {
-            FXMLLoader loader = new FXMLLoader();
+            /*FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("/fxml/Setting.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
             Stage dialog = new Stage();
@@ -81,8 +81,11 @@ public class MainController implements Initializable {
             dialog.setScene(scene);
             SettingController controller = loader.getController();
             controller.setStage(dialog);
-            dialog.showAndWait();
-        } catch (IOException e) {
+            dialog.showAndWait();*/
+            Settings settings =new Settings();                  
+            SettingsFormGenerator form =new  SettingsFormGenerator(settings);
+            form.show();
+        } catch (Exception e) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
 
         }
@@ -91,19 +94,8 @@ public class MainController implements Initializable {
     @FXML
     private void onImportButton() {
         try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("/fxml/Setting.fxml"));
-            AnchorPane page = (AnchorPane) loader.load();
-            Stage dialog = new Stage();
-            Stage stage = (Stage) closeButton.getScene().getWindow();
-            dialog.setTitle("Настройки");
-            dialog.initOwner(stage);
-            Scene scene = new Scene(page);
-            dialog.setScene(scene);
-            SettingController controller = loader.getController();
-            controller.setStage(dialog);
-            dialog.showAndWait();
-        } catch (IOException e) {
+            
+        } catch (Exception e) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
 
         }
@@ -138,10 +130,10 @@ public class MainController implements Initializable {
     @FXML
     private void onSaveParamButton() {
         Settings settings = new Settings();
-        String server = settings.getServer();
-        String user = settings.getUser();
-        String db = settings.getFilePath();
-        String password = settings.getPassword();
+        String server = settings.getValue("server");
+        String user = settings.getValue("user");
+        String db = settings.getValue("database");
+        String password = settings.getValue("password");
         FirmEntity firm = firmTableView.getSelectionModel().selectedItemProperty().getValue();
         ParamsEntity entity = new ParamsEntity(startRowTextEdit.getText(), maxRowTextFiled.getText(), countColTextEdit.getText(),
                 summColTextEdit.getText(), artikulColTextEdit.getText(),
@@ -160,10 +152,10 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         Settings settings = new Settings();
-        String server = settings.getServer();
-        String user = settings.getUser();
-        String db = settings.getFilePath();
-        String password = settings.getPassword();
+        String server = settings.getValue("server");
+        String user = settings.getValue("user");
+        String db = settings.getValue("database");
+        String password = settings.getValue("password");
         try {
             String conString = "jdbc:mysql://";
             conString += server;

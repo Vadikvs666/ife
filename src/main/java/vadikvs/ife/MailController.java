@@ -95,12 +95,12 @@ public class MailController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         settings = new Settings();
-        String protocol = settings.getProtocolMail();
-        String host = settings.getServerMail();
-        String port = settings.getPortMail();
-        String userName = settings.getUserMail();
-        String password = settings.getUserPassword();
-        String count = settings.getCountMail();
+        String protocol = settings.getValue("protocol");
+        String host = settings.getValue("serverMail");
+        String port = settings.getValue("portMail");
+        String userName = settings.getValue("userMail");
+        String password = settings.getValue("passMail");
+        String count = settings.getValue("countMail");
         email = new Email(protocol, host, port, userName, password);
         Message[] messages = email.getMessages("INBOX", Integer.valueOf(count));
         for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
@@ -215,11 +215,12 @@ public class MailController implements Initializable {
         for (int i = 0; i < addData.size(); i++) {
             AtachmentEntity entity = addData.get(i);
             DataExtractor DE = new DataExtractor(entity, param);
-            products.addAll(DE.getProductsFromFile(settings.getTempPath()));
+            products.addAll(DE.getProductsFromFile(settings.getValue("tempPath")));
         }
-        RequestMaker req = new RequestMaker(products, settings.getServer(), "30");
+        RequestMaker req = new RequestMaker(products, settings.getValue("server"), 
+                                                settings.getValue("addition"));
         BrowserLauncher bl= new BrowserLauncher();
-        bl.openBrowser(req.getStringRequest());
+        bl.openBrowser(req.getStringRequest(),settings.getValue("browser"));
         sendButton.setDisable(true);
     }
 
@@ -232,16 +233,6 @@ public class MailController implements Initializable {
         stage.setTitle(firm.getName());
     }
 
-    private void openBrowser(String url) {
-        try {
-            URI u = new URI(url);
-            System.out.println(u.toString());
-            java.awt.Desktop.getDesktop().browse(u);
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(MailController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (URISyntaxException | IOException ex) {
-            Logger.getLogger(MailController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+   
 
 }
