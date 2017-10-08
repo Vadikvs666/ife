@@ -8,17 +8,17 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="453.0" prefWidth="971.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vadikvs.ife.MailController">
+<AnchorPane id="AnchorPane" prefHeight="750.0" prefWidth="1100.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vadikvs.ife.MailController">
     <stylesheets>
         <URL value="@/styles/mail.css" />
     </stylesheets>
     <children>
-        <TableView fx:id="mailTableView" layoutX="33.0" layoutY="27.0" onKeyPressed="#onMailSelect" onMouseClicked="#onMailSelect" prefHeight="200.0" prefWidth="200.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+        <TableView fx:id="mailTableView" layoutX="33.0" layoutY="27.0" onKeyPressed="#onMailSelect" onMouseClicked="#onMailSelect" prefHeight="484.0" prefWidth="1100.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
             <columns>
                 <!-- Колонки таблицы -->
                 <TableColumn fx:id="idColumn" prefWidth="50.0" text="№" />
-                <TableColumn fx:id="fromColumn" prefWidth="320.0" text="Отправитель" />
-                <TableColumn fx:id="subjectColumn" prefWidth="300.0" text="Тема" />
+                <TableColumn fx:id="fromColumn" prefWidth="400.0" text="Отправитель" />
+                <TableColumn fx:id="subjectColumn" prefWidth="350.0" text="Тема" />
                 <TableColumn fx:id="dateColumn" prefWidth="250.0" text="Дата" />
             </columns>
         </TableView>
