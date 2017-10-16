@@ -230,7 +230,13 @@ public class MailController implements Initializable {
         RequestMaker req = new RequestMaker(products, settings.getValue("server"),
                 settings.getValue("addition"));
         BrowserLauncher bl = new BrowserLauncher();
-        bl.openBrowser(req.getStringRequest(), settings.getValue("browser"));
+        JsonMaker jm =new JsonMaker(products);
+        String data = jm.getJson();
+        Float addition = Float.parseFloat(settings.getValue("addition"));
+        Ife ife =new Ife(data,firm.getId(),addition,"");
+        DA.insertIfe(ife);
+        bl.openBrowser(req.getStringWithHash(ife.getHash()), 
+                settings.getValue("browser"));
         sendButton.setDisable(true);
     }
 

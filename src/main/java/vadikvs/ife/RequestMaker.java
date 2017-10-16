@@ -47,6 +47,20 @@ public class RequestMaker {
         return res;
     }
     
+    public String getStringWithHash(String hash){
+        String start=server+"/admin/inputdocs/manual"+"?";
+        String request="";       
+        request+="hash="+hash;
+        String res="";
+        try {
+            res=new URI("http", server, "/admin/inputdocs/manual", request, "").toString();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(RequestMaker.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println(res);
+        return res;
+    }
+    
     private String getJSONString(ProductEntity product){
         String result="";
         JSONObject obj = new JSONObject();

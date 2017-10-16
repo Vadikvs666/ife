@@ -6,10 +6,12 @@ package vadikvs.ife;
 
 import java.sql.Statement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -92,6 +94,27 @@ public class DataAccessor {
             st.setInt(7, entity.getNumber_row());
             st.setInt(8, entity.getFirm());
             st.setInt(9, entity.getName_col());
+            return st.execute();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(DataAccessor.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        return false;
+    }
+    
+    public boolean insertIfe(Ife entity)  {
+        try {
+            
+            PreparedStatement st = connection.prepareStatement(
+              "INSERT INTO ife "
+                      + "(created_at,firm,addition,doc_number,data, hash)"
+                       + "VALUES(?,?,?,?,?,?)");
+            st.setDate(1, Date.valueOf(entity.getCreatedAt()));
+            st.setInt(2, entity.getFirm());
+            st.setFloat(3, entity.getAddition());
+            st.setString(4, entity.getDocNumber());
+            st.setString(5, entity.getData());
+            st.setString(6, entity.getHash());
             return st.execute();
             
         } catch (SQLException ex) {
