@@ -50,6 +50,7 @@ public class MailController implements Initializable {
     private Stage stage;
     private FirmEntity firm;
     private ParamsEntity param;
+    private DataAccessor DA;
 
     public void setParam(ParamsEntity param) {
         this.param = param;
@@ -100,7 +101,16 @@ public class MailController implements Initializable {
         String port = settings.getValue("portMail");
         String userName = settings.getValue("userMail");
         String password = settings.getValue("passMail");
-        String count = settings.getValue("countMail");
+        String count = settings.getValue("countMail");            
+        String server = settings.getValue("server");
+        String user = settings.getValue("user");
+        String db = settings.getValue("database");
+        String password_db = settings.getValue("password");
+        String conString = "jdbc:mysql://";
+        conString += server;
+        conString += "/";
+        conString += db;
+        DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password_db);
         email = new Email(protocol, host, port, userName, password);
         Message[] messages = email.getMessages("INBOX", Integer.valueOf(count));
         for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
@@ -217,10 +227,10 @@ public class MailController implements Initializable {
             DataExtractor DE = new DataExtractor(entity, param);
             products.addAll(DE.getProductsFromFile(settings.getValue("tempPath")));
         }
-        RequestMaker req = new RequestMaker(products, settings.getValue("server"), 
-                                                settings.getValue("addition"));
-        BrowserLauncher bl= new BrowserLauncher();
-        bl.openBrowser(req.getStringRequest(),settings.getValue("browser"));
+        RequestMaker req = new RequestMaker(products, settings.getValue("server"),
+                settings.getValue("addition"));
+        BrowserLauncher bl = new BrowserLauncher();
+        bl.openBrowser(req.getStringRequest(), settings.getValue("browser"));
         sendButton.setDisable(true);
     }
 
@@ -231,8 +241,7 @@ public class MailController implements Initializable {
     public void onFirmChanged(FirmEntity firm) {
         this.firm = firm;
         stage.setTitle(firm.getName());
+        this.param = DA.getParamsByFirmId(firm.getId());
     }
-
-   
 
 }

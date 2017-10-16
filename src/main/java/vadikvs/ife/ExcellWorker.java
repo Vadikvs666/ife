@@ -39,11 +39,19 @@ public class ExcellWorker {
         try {
             this.file = file;
             String ext = Utility.getFileExtensions(file);
+            System.out.println(ext);
             switch (ext) {
                 case "xls":
-                    // xlsBook = new HSSFWorkbook(new FileInputStream(file));
-                    jxlsBook = Workbook.getWorkbook(file);
-                    xlsxBook = null;
+                    try{
+                        jxlsBook = Workbook.getWorkbook(file);
+                        xlsBook = null;
+                        xlsxBook = null;
+                    }
+                    catch(Exception ex){
+                        xlsBook = new HSSFWorkbook(new FileInputStream(file));
+                        jxlsBook = null;
+                        xlsxBook = null;
+                    }
                     break;
                 case "xlsx":
                     xlsxBook = new XSSFWorkbook(new FileInputStream(file));
@@ -56,17 +64,17 @@ public class ExcellWorker {
             }
         } catch (IOException ex) {
             Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (BiffException ex) {
-            Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
     }
 
     public String getData(int row, int col) {
         String data = "";
         if (jxlsBook != null) {
             data = getDatafromJXLS(row, col);
-        } else {
+        } else if(xlsxBook!=null) {
             data = getDatafromXLSX(row, col);
+        } else if(xlsBook!=null){
+            data=getDatafromXLS(row, col);
         }
         return data;
     }
