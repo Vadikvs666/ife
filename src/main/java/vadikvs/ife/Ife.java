@@ -4,6 +4,7 @@
  */
 package vadikvs.ife;
 import java.time.LocalDate;
+import java.util.Date;
 /**
  *
  * @author vadim
@@ -26,7 +27,9 @@ public class Ife {
     }
     
     private String makeHash(String data){
-        return String.valueOf(data.hashCode());
+        Date date=new Date();
+        String temp=data+date.toString();
+        return String.valueOf(temp.hashCode());
     }
 
     public String getData() {
