@@ -16,23 +16,30 @@ public class DataExtractor {
 
     private AtachmentEntity atach;
     private ParamsEntity param;
+    private File file;
 
     public DataExtractor(AtachmentEntity atach, ParamsEntity param) {
         this.atach = atach;
         this.param = param;
     }
+    
+    public DataExtractor(File file, ParamsEntity param){
+        this.file=file;
+        this.param = param;
+    }
 
     public List<ProductEntity> getProductsFromFile(String tempPath) {
         List<ProductEntity> list = new ArrayList<>();
-        atach.saveAtach(tempPath);
         int start_row = param.getStart_row();
         int max_row = param.getMax_row();
         int count_col = param.getCount_col();
         int summ_col = param.getSumm_col();
         int artikul_col = param.getArtikul_col();
         int name_col = param.getName_col();
-        File file = new File(tempPath + File.separatorChar + atach.getFilename());
-        ExcellWorker excell = new ExcellWorker(file);
+        if(this.file==null){
+            this.file=getFileFromAtach(atach,tempPath);
+        }
+        ExcellWorker excell = new ExcellWorker(this.file);
         for (int row = start_row; row < max_row; row++) {
             String artikul = excell.getData(row, artikul_col);
             String name = excell.getData(row, name_col);
@@ -49,6 +56,13 @@ public class DataExtractor {
             }
         }
         return list;
+    }
+    
+    
+    private File getFileFromAtach(AtachmentEntity atach,String tempPath){
+        atach.saveAtach(tempPath);
+        File file = new File(tempPath + File.separatorChar + atach.getFilename());
+        return file;
     }
 
 }

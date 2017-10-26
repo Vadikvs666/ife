@@ -1,8 +1,10 @@
 package vadikvs.ife;
 
 import com.vadikvs.Signalslots.Signal;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -20,6 +22,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class MainController implements Initializable {
@@ -60,6 +63,7 @@ public class MainController implements Initializable {
     private TextField numberRowTextEdit;
     @FXML
     private TextField maxRowTextFiled;
+
     @FXML
     private void onCloseButton(ActionEvent event) {
         close.emit();
@@ -70,20 +74,8 @@ public class MainController implements Initializable {
     @FXML
     private void onSettingsButton() {
         try {
-            /*FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("/fxml/Setting.fxml"));
-            AnchorPane page = (AnchorPane) loader.load();
-            Stage dialog = new Stage();
-            Stage stage = (Stage) closeButton.getScene().getWindow();
-            dialog.setTitle("Настройки");
-            dialog.initOwner(stage);
-            Scene scene = new Scene(page);
-            dialog.setScene(scene);
-            SettingController controller = loader.getController();
-            controller.setStage(dialog);
-            dialog.showAndWait();*/
-            Settings settings =new Settings();                  
-            SettingsFormGenerator form =new  SettingsFormGenerator(settings);
+            Settings settings = new Settings();
+            SettingsFormGenerator form = new SettingsFormGenerator(settings);
             form.show();
         } catch (Exception e) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
@@ -94,7 +86,23 @@ public class MainController implements Initializable {
     @FXML
     private void onImportButton() {
         try {
-            
+            Settings settings = new Settings();
+            FileChooser chooser = new FileChooser();
+            Stage stage = (Stage) closeButton.getScene().getWindow();
+            File file = chooser.showOpenDialog(stage);
+            List<ProductEntity> products = new ArrayList<>();
+            DataExtractor DE = new DataExtractor(file, getCurrentParam());
+            products.addAll(DE.getProductsFromFile(settings.getValue("tempPath")));
+            RequestMaker req = new RequestMaker(products, settings.getValue("server"),
+                    settings.getValue("addition"));
+            BrowserLauncher bl = new BrowserLauncher();
+            JsonMaker jm = new JsonMaker(products);
+            String data = jm.getJson();
+            Float addition = Float.parseFloat(settings.getValue("addition"));
+            Ife ife = new Ife(data, getCurrentFirm().getId(), addition, "");
+            DA.insertIfe(ife);
+            bl.openBrowser(req.getStringWithHash(ife.getHash()),
+                    settings.getValue("browser"));
         } catch (Exception e) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
 
@@ -109,7 +117,7 @@ public class MainController implements Initializable {
             AnchorPane page = (AnchorPane) loader.load();
             Stage dialog = new Stage();
             Stage stage = (Stage) closeButton.getScene().getWindow();
-            FirmEntity firm= firmTableView.getSelectionModel().selectedItemProperty().getValue();
+            FirmEntity firm = getCurrentFirm();
             dialog.setTitle("Выбрать счета для переделки фирмы: " + firm.getName());
             dialog.initOwner(stage);
             Scene scene = new Scene(page);
@@ -117,7 +125,7 @@ public class MainController implements Initializable {
             MailController controller = loader.getController();
             controller.setStage(dialog);
             controller.setFirm(firm);
-            controller.setParam(DA.getParamsByFirmId(firm.getId()));
+            controller.setParam(getCurrentParam());
             close.connect(controller.closeAction);
             firmChanged.connect(controller.firmChanged);
             dialog.showAndWait();
@@ -134,7 +142,7 @@ public class MainController implements Initializable {
         String user = settings.getValue("user");
         String db = settings.getValue("database");
         String password = settings.getValue("password");
-        FirmEntity firm = firmTableView.getSelectionModel().selectedItemProperty().getValue();
+        FirmEntity firm = getCurrentFirm();
         ParamsEntity entity = new ParamsEntity(startRowTextEdit.getText(), maxRowTextFiled.getText(), countColTextEdit.getText(),
                 summColTextEdit.getText(), artikulColTextEdit.getText(),
                 nameColTextEdit.getText(), numberColTextEdit.getText(),
@@ -170,17 +178,14 @@ public class MainController implements Initializable {
             firmTableView.getSelectionModel().select(0);
             onFirmSelect();
         } catch (Exception ex) {
-           // onSaveParamButton();
+            // onSaveParamButton();
         }
 
     }
 
     public void onFirmSelect() {
         clearParamsTextFields();
-        FirmEntity entity = firmTableView.getSelectionModel().selectedItemProperty().getValue();
-        Object[] args = {entity};
-        firmChanged.emit(args);
-        ParamsEntity params = DA.getParamsByFirmId(entity.getId());
+        ParamsEntity params = getCurrentParam();
         startRowTextEdit.setText(params.getStart_rowString());
         numberColTextEdit.setText(params.getNumber_colString());
         numberRowTextEdit.setText(params.getNumber_rowString());
@@ -203,4 +208,13 @@ public class MainController implements Initializable {
         maxRowTextFiled.setText("");
     }
 
+    private ParamsEntity getCurrentParam() {
+        FirmEntity entity = getCurrentFirm();
+        Object[] args = {entity};
+        firmChanged.emit(args);
+        return DA.getParamsByFirmId(entity.getId());
+    }
+    private FirmEntity getCurrentFirm(){
+        return firmTableView.getSelectionModel().selectedItemProperty().getValue();
+    }
 }

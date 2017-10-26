@@ -63,7 +63,18 @@ public class ExcellWorker {
                     break;
             }
         } catch (IOException ex) {
-            Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
+                xlsxBook = new XSSFWorkbook(new FileInputStream(
+                        XLXSConverter.convertFile(file, "http://in.hoz.center/converttoxlxs")));
+                xlsBook = null;
+            } catch (FileNotFoundException ex1) {
+                Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex1);
+            } catch (IOException ex1) {
+                Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex1);
+            } catch (Exception ex1) {
+                Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         } 
     }
 

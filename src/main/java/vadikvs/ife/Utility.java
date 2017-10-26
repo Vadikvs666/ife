@@ -33,13 +33,14 @@ public class Utility {
         try {
             try (BufferedInputStream in = new BufferedInputStream(stream)) {
                 BufferedOutputStream out = null;
-                byte[] buf = new byte[65535]; // буфер ввода/вывода
+                byte[] buf = new byte[5242880]; // буфер ввода/вывода
+                File folder;
+                folder = new File(path);
+                if (!folder.exists()) {
+                    folder.mkdirs();
+                }
                 while (in.read(buf) != -1) {
-                    File folder;
-                    folder = new File(path);
-                    if (!folder.exists()) {
-                        folder.mkdirs();
-                    }
+
                     out = new BufferedOutputStream(new FileOutputStream(path + File.separatorChar + filename));
                 }
                 out.write(buf);
@@ -73,12 +74,12 @@ public class Utility {
         }
         return res.replace(",", ".");
     }
-    
-    public static String encodeUrl(String url){
-        String uri="";
+
+    public static String encodeUrl(String url) {
+        String uri = "";
         try {
-            uri = URLEncoder.encode(url,"utf-8");
-            
+            uri = URLEncoder.encode(url, "utf-8");
+
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(Utility.class.getName()).log(Level.SEVERE, null, ex);
         }
