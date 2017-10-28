@@ -122,32 +122,10 @@ public class MessageUtility {
     public static String getBody(Message message) {
         String body = "";
         try {
-            String contentType = message.getContentType();
-            if (contentType.contains("text/plain")
-                    || contentType.contains("text/html")) {
-                Object content = message.getContent();
-                if (content != null) {
-                    body = content.toString();
-                }
-            }
-            if (contentType.contains("multipart")) {
-                Multipart multiPart = (Multipart) message.getContent();
-                for (int j = 0; j < multiPart.getCount(); j++) {
-                    BodyPart bodyPart = multiPart.getBodyPart(j);
-                    String disposition = bodyPart.getDisposition();
-                    if (disposition != null && (disposition.equals(BodyPart.ATTACHMENT))) {
-
-                    } else {
-                        body = bodyPart.getContent().toString();
-                    }
-                    
-
-                }
-            }
+            body = getText(message);
         } catch (IOException | MessagingException ex) {
             Logger.getLogger(MessageUtility.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("Emal body:" + body);
         return body;
     }
 
@@ -169,6 +147,27 @@ public class MessageUtility {
             Logger.getLogger(MessageUtility.class.getName()).log(Level.SEVERE, null, ex);
         }
         return atach;
+    }
+
+    private static String getText(Part p) throws
+            MessagingException, IOException {
+        String s = "";
+        String contentType = p.getContentType();
+        if (contentType.contains("text/plain")
+                || contentType.contains("text/html")) {
+            Object content = p.getContent();
+            if (content != null) {
+                s = content.toString();
+            }
+        }
+        if (contentType.contains("multipart")) {
+            Multipart mp = (Multipart) p.getContent();
+            for (int i = 0; i < mp.getCount(); i++) {
+                Part bp = mp.getBodyPart(i);
+                return getText(bp);
+            }
+        }
+        return s;
     }
 
 }

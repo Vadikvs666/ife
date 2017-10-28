@@ -95,5 +95,10 @@ public class Email {
             Logger.getLogger(Email.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public Integer getCountMessagesInFolder(String folder) throws MessagingException{
+        Folder fold = store.getFolder(folder);
+        return fold.getMessageCount();
+    }
 
 }
