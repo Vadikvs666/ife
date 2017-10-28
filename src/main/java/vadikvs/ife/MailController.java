@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -101,7 +102,7 @@ public class MailController implements Initializable {
         String port = settings.getValue("portMail");
         String userName = settings.getValue("userMail");
         String password = settings.getValue("passMail");
-        String count = settings.getValue("countMail");            
+        String count = settings.getValue("countMail");
         String server = settings.getValue("server");
         String user = settings.getValue("user");
         String db = settings.getValue("database");
@@ -112,22 +113,44 @@ public class MailController implements Initializable {
         conString += db;
         DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password_db);
         email = new Email(protocol, host, port, userName, password);
-        Message[] messages = email.getMessages("INBOX", Integer.valueOf(count));
-        for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
-            MessageEntity entity = new MessageEntity(messages[i]);
-            messageData.add(entity);
-        }
-        sendButton.setDisable(true);
-        addButton.setDisable(true);
-        deleteButton.setDisable(true);
-        saveButton.setDisable(true);
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        fromColumn.setCellValueFactory(new PropertyValueFactory<>("from"));
-        subjectColumn.setCellValueFactory(new PropertyValueFactory<>("subject"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-        addColumn.setCellValueFactory(new PropertyValueFactory<>("filename"));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Message[] messages = email.getMessages("INBOX", Integer.valueOf(count));
+                for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
+                    final int counter = i;
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            messageData.add(new MessageEntity(messages[counter]));
+                        }
+                    });
+                }
+            }
+        }).start();
+
+        sendButton.setDisable(
+                true);
+        addButton.setDisable(
+                true);
+        deleteButton.setDisable(
+                true);
+        saveButton.setDisable(
+                true);
+        idColumn.setCellValueFactory(
+                new PropertyValueFactory<>("id"));
+        fromColumn.setCellValueFactory(
+                new PropertyValueFactory<>("from"));
+        subjectColumn.setCellValueFactory(
+                new PropertyValueFactory<>("subject"));
+        dateColumn.setCellValueFactory(
+                new PropertyValueFactory<>("date"));
+        addColumn.setCellValueFactory(
+                new PropertyValueFactory<>("filename"));
         mailTableView.setItems(messageData);
-        mailTableView.setEditable(true);
+
+        mailTableView.setEditable(
+                true);
         addedfileListView.setItems(addData);
 
     }
@@ -222,20 +245,22 @@ public class MailController implements Initializable {
     @FXML
     public void onSendButton() {
         List<ProductEntity> products = new ArrayList<>();
+        String tempPath=settings.getValue("tempPath");
+        String converterServer=settings.getValue("converterServer");
         for (int i = 0; i < addData.size(); i++) {
             AtachmentEntity entity = addData.get(i);
             DataExtractor DE = new DataExtractor(entity, param);
-            products.addAll(DE.getProductsFromFile(settings.getValue("tempPath")));
+            products.addAll(DE.getProductsFromFile(tempPath,converterServer));
         }
         RequestMaker req = new RequestMaker(products, settings.getValue("server"),
                 settings.getValue("addition"));
         BrowserLauncher bl = new BrowserLauncher();
-        JsonMaker jm =new JsonMaker(products);
+        JsonMaker jm = new JsonMaker(products);
         String data = jm.getJson();
         Float addition = Float.parseFloat(settings.getValue("addition"));
-        Ife ife =new Ife(data,firm.getId(),addition,"");
+        Ife ife = new Ife(data, firm.getId(), addition, "");
         DA.insertIfe(ife);
-        bl.openBrowser(req.getStringWithHash(ife.getHash()), 
+        bl.openBrowser(req.getStringWithHash(ife.getHash()),
                 settings.getValue("browser"));
         sendButton.setDisable(true);
     }

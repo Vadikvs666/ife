@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane id="AnchorPane" prefHeight="700.0" prefWidth="1100.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vadikvs.ife.MailController">
@@ -34,5 +35,6 @@
         <Button fx:id="saveButton" layoutX="891.0" layoutY="407.0" maxHeight="30.0" maxWidth="115.0" minHeight="30.0" minWidth="115.0" mnemonicParsing="false" onAction="#onSaveButton" prefHeight="30.0" text="Сохранить" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="510.0" />
         <Button fx:id="exitButton" layoutX="891.0" layoutY="407.0" maxWidth="65.0" minWidth="65.0" mnemonicParsing="false" onAction="#onExitButton" text="Выход" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
         <Button fx:id="sendButton" layoutX="810.0" layoutY="407.0" mnemonicParsing="false" onAction="#onSendButton" text="Отправить файлы" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
+      <TextArea fx:id="emailBody" layoutX="673.0" layoutY="435.0" prefHeight="200.0" prefWidth="412.0" AnchorPane.bottomAnchor="65.0" AnchorPane.rightAnchor="15.0" />
     </children>
 </AnchorPane>

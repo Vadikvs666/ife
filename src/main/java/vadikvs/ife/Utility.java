@@ -14,6 +14,19 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 /**
  *
@@ -31,21 +44,9 @@ public class Utility {
      */
     public static boolean saveFile(InputStream stream, String filename, String path) {
         try {
-            try (BufferedInputStream in = new BufferedInputStream(stream)) {
-                BufferedOutputStream out = null;
-                byte[] buf = new byte[5242880]; // буфер ввода/вывода
-                File folder;
-                folder = new File(path);
-                if (!folder.exists()) {
-                    folder.mkdirs();
-                }
-                while (in.read(buf) != -1) {
+            File targetFile = new File(path + File.separatorChar + filename);
+            FileUtils.copyInputStreamToFile(stream, targetFile);
 
-                    out = new BufferedOutputStream(new FileOutputStream(path + File.separatorChar + filename));
-                }
-                out.write(buf);
-                out.close();
-            }
         } catch (IOException ex) {
             Logger.getLogger(Utility.class.getName()).log(Level.SEVERE, "Unable to save file", ex);
             return false;
@@ -86,4 +87,27 @@ public class Utility {
         return uri;
     }
 
+    public static File convertXLSToXLSXFile(File file, String converterServer, String tempPath) throws Exception {
+
+        HttpClient httpclient = HttpClientBuilder.create().build();;
+        HttpPost post = new HttpPost(converterServer);
+        FileBody fileBody = new FileBody(file, ContentType.DEFAULT_BINARY);
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        builder.addPart("file", fileBody);
+        HttpEntity entity = builder.build();
+        post.setEntity(entity);
+        System.out.println("executing request " + post.getRequestLine());
+        HttpResponse response = httpclient.execute(post);
+        HttpEntity res = response.getEntity();
+        int responseCode = response.getStatusLine().getStatusCode();
+        System.out.println("Request Url: " + post.getURI());
+        System.out.println("Response Code: " + responseCode);
+        String filename = "temp.xlsx";
+        String path = tempPath;
+        InputStream in = res.getContent();
+        Utility.saveFile(in, filename, path);
+        File targetFile = new File(path + File.separatorChar + filename);
+        return targetFile;
+    }
 }

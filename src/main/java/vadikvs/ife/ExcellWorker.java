@@ -31,61 +31,44 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class ExcellWorker {
 
     private File file;
-    HSSFWorkbook xlsBook;
-    XSSFWorkbook xlsxBook;
-    Workbook jxlsBook;
+    HSSFWorkbook xlsBook = null;
+    XSSFWorkbook xlsxBook = null;
+    Workbook jxlsBook = null;
 
-    public ExcellWorker(File file) {
+    public ExcellWorker(File file, String converterServer, String tempPath) {
         try {
             this.file = file;
             String ext = Utility.getFileExtensions(file);
             System.out.println(ext);
             switch (ext) {
-                case "xls":
-                    try{
-                        jxlsBook = Workbook.getWorkbook(file);
-                        xlsBook = null;
-                        xlsxBook = null;
-                    }
-                    catch(Exception ex){
-                        xlsBook = new HSSFWorkbook(new FileInputStream(file));
-                        jxlsBook = null;
-                        xlsxBook = null;
-                    }
-                    break;
                 case "xlsx":
                     xlsxBook = new XSSFWorkbook(new FileInputStream(file));
                     xlsBook = null;
                     break;
                 default:
+                    this.file = Utility.convertXLSToXLSXFile(file, converterServer, tempPath);
+                    System.out.println(this.file.getAbsolutePath());
+                    xlsxBook = new XSSFWorkbook(new FileInputStream(this.file));
                     xlsBook = null;
-                    xlsxBook = null;
                     break;
             }
         } catch (IOException ex) {
-            try {
-                Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
-                xlsxBook = new XSSFWorkbook(new FileInputStream(
-                        XLXSConverter.convertFile(file, "http://in.hoz.center/converttoxlxs")));
-                xlsBook = null;
-            } catch (FileNotFoundException ex1) {
-                Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex1);
-            } catch (IOException ex1) {
-                Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex1);
-            } catch (Exception ex1) {
-                Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-        } 
+
+            Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (Exception ex) {
+            Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public String getData(int row, int col) {
         String data = "";
         if (jxlsBook != null) {
             data = getDatafromJXLS(row, col);
-        } else if(xlsxBook!=null) {
+        } else if (xlsxBook != null) {
             data = getDatafromXLSX(row, col);
-        } else if(xlsBook!=null){
-            data=getDatafromXLS(row, col);
+        } else if (xlsBook != null) {
+            data = getDatafromXLS(row, col);
         }
         return data;
     }
@@ -132,7 +115,7 @@ public class ExcellWorker {
         String data = "";
         Sheet sheet = jxlsBook.getSheet(0);
         if (row - 1 < sheet.getRows()) {
-            if (col - 1 <  sheet.getColumns()) {
+            if (col - 1 < sheet.getColumns()) {
                 Cell cell = sheet.getCell(col - 1, row - 1);
                 data = cell.getContents();
             }

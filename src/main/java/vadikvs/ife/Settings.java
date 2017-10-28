@@ -97,6 +97,8 @@ public class Settings {
         settings.add(browser);
         Setting  addtition= new Setting("addition", "Наценка: ", "30");
         settings.add(addtition);
+        Setting  converterServer= new Setting("converterServer", "сервер конвертирования файлов: ", "in.hoz.center/converttoxlsx");
+        settings.add(converterServer);
 
     }
 

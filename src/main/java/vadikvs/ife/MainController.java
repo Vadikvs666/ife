@@ -92,7 +92,9 @@ public class MainController implements Initializable {
             File file = chooser.showOpenDialog(stage);
             List<ProductEntity> products = new ArrayList<>();
             DataExtractor DE = new DataExtractor(file, getCurrentParam());
-            products.addAll(DE.getProductsFromFile(settings.getValue("tempPath")));
+            String tempPath=settings.getValue("tempPath");
+            String converterServer=settings.getValue("converterServer");
+            products.addAll(DE.getProductsFromFile(tempPath,converterServer));
             RequestMaker req = new RequestMaker(products, settings.getValue("server"),
                     settings.getValue("addition"));
             BrowserLauncher bl = new BrowserLauncher();

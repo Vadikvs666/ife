@@ -28,7 +28,7 @@ public class DataExtractor {
         this.param = param;
     }
 
-    public List<ProductEntity> getProductsFromFile(String tempPath) {
+    public List<ProductEntity> getProductsFromFile(String tempPath,String converterServer) {
         List<ProductEntity> list = new ArrayList<>();
         int start_row = param.getStart_row();
         int max_row = param.getMax_row();
@@ -39,7 +39,7 @@ public class DataExtractor {
         if(this.file==null){
             this.file=getFileFromAtach(atach,tempPath);
         }
-        ExcellWorker excell = new ExcellWorker(this.file);
+        ExcellWorker excell = new ExcellWorker(this.file,converterServer,tempPath);
         for (int row = start_row; row < max_row; row++) {
             String artikul = excell.getData(row, artikul_col);
             String name = excell.getData(row, name_col);
