@@ -29,8 +29,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javax.mail.Message;
@@ -67,7 +69,6 @@ public class MailController implements Initializable {
     private Button deleteButton;
     @FXML
     private Button saveButton;
-
     @FXML
     private TableView<MessageEntity> mailTableView;
     @FXML
@@ -76,16 +77,16 @@ public class MailController implements Initializable {
     private TableView<AtachmentEntity> addedfileListView;
     @FXML
     private TableColumn<MessageEntity, String> fromColumn;
-
     @FXML
     private TableColumn<MessageEntity, String> subjectColumn;
-
     @FXML
     private TableColumn<MessageEntity, Date> dateColumn;
     @FXML
     private TableColumn<MessageEntity, Integer> idColumn;
     @FXML
     private TableColumn<AtachmentEntity, String> addColumn;
+    @FXML
+    private WebView emailBody;
     private Settings settings;
 
     /**
@@ -172,6 +173,7 @@ public class MailController implements Initializable {
         MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
         atachData = entity.getAtach();
         fileListView.setItems(atachData);
+        emailBody.getEngine().loadContent(entity.getBody());
     }
 
     @FXML

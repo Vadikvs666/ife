@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.Address;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -129,9 +130,24 @@ public class MessageUtility {
                     body = content.toString();
                 }
             }
+            if (contentType.contains("multipart")) {
+                Multipart multiPart = (Multipart) message.getContent();
+                for (int j = 0; j < multiPart.getCount(); j++) {
+                    BodyPart bodyPart = multiPart.getBodyPart(j);
+                    String disposition = bodyPart.getDisposition();
+                    if (disposition != null && (disposition.equals(BodyPart.ATTACHMENT))) {
+
+                    } else {
+                        body = bodyPart.getContent().toString();
+                    }
+                    
+
+                }
+            }
         } catch (IOException | MessagingException ex) {
             Logger.getLogger(MessageUtility.class.getName()).log(Level.SEVERE, null, ex);
         }
+        System.out.println("Emal body:" + body);
         return body;
     }
 
@@ -155,5 +171,4 @@ public class MessageUtility {
         return atach;
     }
 
-    
 }
