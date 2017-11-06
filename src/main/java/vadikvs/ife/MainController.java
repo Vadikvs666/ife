@@ -1,10 +1,8 @@
 package vadikvs.ife;
 
 import com.vadikvs.Signalslots.Signal;
-import java.io.File;
-import java.io.IOException;
+import com.vadikvs.Signalslots.Slot;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -13,16 +11,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class MainController implements Initializable {
@@ -30,6 +24,7 @@ public class MainController implements Initializable {
     private ObservableList<FirmEntity> firmData = FXCollections.observableArrayList();
     public Signal close = new Signal();
     public Signal firmChanged = new Signal();
+    public Slot closeAction = new Slot(this, "onCloseButton");
     private DataAccessor DA;
     @FXML
     private Button closeButton;
@@ -69,7 +64,7 @@ public class MainController implements Initializable {
         this.stage = stage;
     }
     @FXML
-    private void onCloseButton(ActionEvent event) {
+    public void onCloseButton() {
         close.emit();
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
@@ -88,33 +83,6 @@ public class MainController implements Initializable {
     }
 
     
-
-    @FXML
-    private void onMailButton() {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("/fxml/Mail.fxml"));
-            AnchorPane page = (AnchorPane) loader.load();
-            Stage dialog = new Stage();
-            Stage stage = (Stage) closeButton.getScene().getWindow();
-            FirmEntity firm = getCurrentFirm();
-            dialog.setTitle("Выбрать счета для переделки фирмы: " + firm.getName());
-            //dialog.initOwner(stage);
-            Scene scene = new Scene(page);
-            dialog.setScene(scene);
-            MailController controller = loader.getController();
-            controller.setStage(dialog);
-            controller.setFirm(firm);
-            controller.setParam(getCurrentParam());
-            close.connect(controller.closeAction);
-            firmChanged.connect(controller.firmChanged);
-            dialog.showAndWait();
-        } catch (IOException e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-
-        }
-    }
-
     @FXML
     private void onSaveParamButton() {
         Settings settings = new Settings();
@@ -158,7 +126,7 @@ public class MainController implements Initializable {
             firmTableView.getSelectionModel().select(0);
             onFirmSelect();
         } catch (Exception ex) {
-            // onSaveParamButton();
+            onSettingsButton();
         }
 
     }

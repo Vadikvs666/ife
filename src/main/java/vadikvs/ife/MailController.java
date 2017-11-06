@@ -5,6 +5,7 @@
  */
 package vadikvs.ife;
 
+import com.vadikvs.Signalslots.Signal;
 import com.vadikvs.Signalslots.Slot;
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +50,7 @@ import javax.mail.MessagingException;
  */
 public class MailController implements Initializable {
 
+    public Signal close = new Signal();
     public Slot closeAction = new Slot(this, "onExitButton");
     public Slot firmChanged = new Slot(this, "onFirmChanged");
     private final ObservableList<MessageEntity> messageData = FXCollections.observableArrayList();
@@ -164,7 +166,7 @@ public class MailController implements Initializable {
         mailTableView.setEditable(
                 true);
         addedfileListView.setItems(addData);
-         //setStage((Stage) exitButton.getScene().getWindow());
+
 
     }
 
@@ -190,14 +192,13 @@ public class MailController implements Initializable {
             loader.setLocation(MainApp.class.getResource("/fxml/Main.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
             Stage dialog = new Stage();
-            Stage stage = this.stage;
             dialog.setTitle("Выбрать  фирму");
-            dialog.initOwner(stage);
             Scene scene = new Scene(page);
             dialog.setScene(scene);
             firmController = loader.getController();
             firmController.setStage(dialog);
             firmChanged.connect(firmController.firmChanged);
+            close.connect(firmController.closeAction);
             dialog.showAndWait();
         } catch (IOException e) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
@@ -208,6 +209,7 @@ public class MailController implements Initializable {
     @FXML
     public void onExitButton() {
         email.disconnect();
+        close.emit();
         Stage stage=(Stage) exitButton.getScene().getWindow();
         stage.close();
     }

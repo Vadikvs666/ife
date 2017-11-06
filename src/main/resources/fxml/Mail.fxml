@@ -14,7 +14,7 @@
         <URL value="@/styles/mail.css" />
     </stylesheets>
     <children>
-        <TableView fx:id="mailTableView" layoutX="33.0" layoutY="27.0" onKeyPressed="#onMailSelect" onMouseClicked="#onMailSelect" prefHeight="400.0" prefWidth="1100.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+        <TableView fx:id="mailTableView" layoutX="33.0" layoutY="27.0" onKeyPressed="#onMailSelect" onMouseClicked="#onMailSelect" prefHeight="400.0" prefWidth="1100.0" AnchorPane.bottomAnchor="285.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
             <placeholder>
                 <Label text="Загрузка сообщений пожалуйста подождите...." />
             </placeholder>
@@ -30,6 +30,9 @@
         <ListView fx:id="fileListView" layoutX="15.0" layoutY="227.0" onKeyPressed="#onFileSelect" onMouseClicked="#onFileSelect" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" />
         <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAddButton" prefWidth="50.0" text="--&gt;" AnchorPane.bottomAnchor="115.0" AnchorPane.leftAnchor="230.0" />
         <TableView fx:id="addedfileListView" layoutX="15.0" layoutY="227.0" onKeyPressed="#onAddFileSelect" onMouseClicked="#onAddFileSelect" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="295.0">
+            <placeholder>
+                <Label text="Файлы не выбраны" />
+            </placeholder>
             <columns>
                 <TableColumn fx:id="addColumn" prefWidth="200.0" text="Выбранные файлы:" />
             </columns>
@@ -38,7 +41,7 @@
         <Button fx:id="saveButton" layoutX="891.0" layoutY="407.0" maxHeight="30.0" maxWidth="115.0" minHeight="30.0" minWidth="115.0" mnemonicParsing="false" onAction="#onSaveButton" prefHeight="30.0" text="Сохранить" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="510.0" />
         <Button fx:id="exitButton" layoutX="891.0" layoutY="407.0" maxWidth="65.0" minWidth="65.0" mnemonicParsing="false" onAction="#onExitButton" text="Выход" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
         <Button fx:id="sendButton" layoutX="810.0" layoutY="407.0" mnemonicParsing="false" onAction="#onSendButton" text="Отправить файлы" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
-        <WebView fx:id="emailBody" layoutX="885.0" layoutY="435.0" prefHeight="200.0" prefWidth="443.0" AnchorPane.bottomAnchor="65.0" AnchorPane.rightAnchor="15.0" />
+        <WebView fx:id="emailBody" layoutX="885.0" layoutY="435.0" prefHeight="200.0" prefWidth="443.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="650.0" AnchorPane.rightAnchor="15.0" />
       <Button fx:id="moreMessageButton" layoutX="14.0" layoutY="420.0" mnemonicParsing="false" onAction="#onMoreMessage" prefHeight="31.0" prefWidth="307.0" text="Загрузить больше сообщений" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="15.0" />
       <Button fx:id="firmSelectButton" layoutX="706.0" layoutY="654.0" mnemonicParsing="false" onAction="#onFirmSelectButton" text="Выбрать фирму" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="255.0" />
       <Button fx:id="settingsButton" layoutX="568.0" layoutY="654.0" mnemonicParsing="false" onAction="#onSettingsButton" text="Настройки" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="400.0" />
