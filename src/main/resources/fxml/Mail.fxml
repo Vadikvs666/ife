@@ -41,7 +41,7 @@
         <Button fx:id="deleteButton" layoutX="891.0" layoutY="407.0" maxHeight="30.0" maxWidth="115.0" minHeight="30.0" minWidth="115.0" mnemonicParsing="false" onAction="#onDeleteButton" prefHeight="30.0" text="Удалить" AnchorPane.bottomAnchor="185.0" AnchorPane.leftAnchor="510.0" />
         <Button fx:id="saveButton" layoutX="891.0" layoutY="407.0" maxHeight="30.0" maxWidth="115.0" minHeight="30.0" minWidth="115.0" mnemonicParsing="false" onAction="#onSaveButton" prefHeight="30.0" text="Сохранить" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="510.0" />
         <Button fx:id="exitButton" layoutX="891.0" layoutY="407.0" maxWidth="65.0" minWidth="65.0" mnemonicParsing="false" onAction="#onExitButton" text="Выход" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
-        <Button fx:id="sendButton" layoutX="510.0" layoutY="560.0" mnemonicParsing="false" onAction="#onSendButton" prefHeight="60.0" prefWidth="115.0" text="Отправить файлы" textAlignment="CENTER" underline="true" wrapText="true" AnchorPane.bottomAnchor="85.0" AnchorPane.leftAnchor="510.0">
+        <Button fx:id="sendButton" layoutX="510.0" layoutY="560.0" mnemonicParsing="false" onAction="#onSendButton" prefHeight="127.0" prefWidth="115.0" style="-fx-background-color: red;" text="Отправить файлы" textAlignment="CENTER" underline="true" wrapText="true" AnchorPane.bottomAnchor="18.0" AnchorPane.leftAnchor="510.0">
          <font>
             <Font name="System Bold" size="15.0" />
          </font></Button>
