@@ -9,7 +9,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -28,12 +27,6 @@ public class MainController implements Initializable {
     private DataAccessor DA;
     @FXML
     private Button closeButton;
-    @FXML
-    private Button settingsButton;
-    @FXML
-    private Button importButton;
-    @FXML
-    private Button mailButton;
     @FXML
     private Button saveParamButton;
     @FXML
@@ -59,30 +52,21 @@ public class MainController implements Initializable {
     @FXML
     private TextField maxRowTextFiled;
     private Stage stage;
-    
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }
+
     @FXML
     public void onCloseButton() {
         close.emit();
+        FirmEntity entity = getCurrentFirm();
+        Object[] args = {entity};
+        firmChanged.emit(args);
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
     }
 
-    @FXML
-    private void onSettingsButton() {
-        try {
-            Settings settings = new Settings();
-            SettingsFormGenerator form = new SettingsFormGenerator(settings);
-            form.show();
-        } catch (Exception e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-
-        }
-    }
-
-    
     @FXML
     private void onSaveParamButton() {
         Settings settings = new Settings();
@@ -126,7 +110,9 @@ public class MainController implements Initializable {
             firmTableView.getSelectionModel().select(0);
             onFirmSelect();
         } catch (Exception ex) {
-            onSettingsButton();
+            settings = new Settings();
+            SettingsFormGenerator form = new SettingsFormGenerator(settings);
+            form.show();
         }
 
     }
@@ -162,7 +148,8 @@ public class MainController implements Initializable {
         firmChanged.emit(args);
         return DA.getParamsByFirmId(entity.getId());
     }
-    private FirmEntity getCurrentFirm(){
+
+    private FirmEntity getCurrentFirm() {
         return firmTableView.getSelectionModel().selectedItemProperty().getValue();
     }
 }

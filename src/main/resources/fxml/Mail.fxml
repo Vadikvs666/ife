@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
 <AnchorPane id="AnchorPane" prefHeight="700.0" prefWidth="1100.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="vadikvs.ife.MailController">
@@ -40,11 +41,14 @@
         <Button fx:id="deleteButton" layoutX="891.0" layoutY="407.0" maxHeight="30.0" maxWidth="115.0" minHeight="30.0" minWidth="115.0" mnemonicParsing="false" onAction="#onDeleteButton" prefHeight="30.0" text="Удалить" AnchorPane.bottomAnchor="185.0" AnchorPane.leftAnchor="510.0" />
         <Button fx:id="saveButton" layoutX="891.0" layoutY="407.0" maxHeight="30.0" maxWidth="115.0" minHeight="30.0" minWidth="115.0" mnemonicParsing="false" onAction="#onSaveButton" prefHeight="30.0" text="Сохранить" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="510.0" />
         <Button fx:id="exitButton" layoutX="891.0" layoutY="407.0" maxWidth="65.0" minWidth="65.0" mnemonicParsing="false" onAction="#onExitButton" text="Выход" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
-        <Button fx:id="sendButton" layoutX="810.0" layoutY="407.0" mnemonicParsing="false" onAction="#onSendButton" text="Отправить файлы" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
+        <Button fx:id="sendButton" layoutX="510.0" layoutY="560.0" mnemonicParsing="false" onAction="#onSendButton" prefHeight="60.0" prefWidth="115.0" text="Отправить файлы" textAlignment="CENTER" underline="true" wrapText="true" AnchorPane.bottomAnchor="85.0" AnchorPane.leftAnchor="510.0">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font></Button>
         <WebView fx:id="emailBody" layoutX="885.0" layoutY="435.0" prefHeight="200.0" prefWidth="443.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="650.0" AnchorPane.rightAnchor="15.0" />
       <Button fx:id="moreMessageButton" layoutX="14.0" layoutY="420.0" mnemonicParsing="false" onAction="#onMoreMessage" prefHeight="31.0" prefWidth="307.0" text="Загрузить больше сообщений" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="15.0" />
-      <Button fx:id="firmSelectButton" layoutX="706.0" layoutY="654.0" mnemonicParsing="false" onAction="#onFirmSelectButton" text="Выбрать фирму" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="255.0" />
-      <Button fx:id="settingsButton" layoutX="568.0" layoutY="654.0" mnemonicParsing="false" onAction="#onSettingsButton" text="Настройки" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="400.0" />
-      <Button fx:id="importButton" layoutX="503.0" layoutY="654.0" mnemonicParsing="false" onAction="#onImportButton" text="Из файла" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="510.0" />
+      <Button fx:id="firmSelectButton" layoutX="876.0" layoutY="654.0" mnemonicParsing="false" onAction="#onFirmSelectButton" text="Выбрать фирму" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
+      <Button fx:id="settingsButton" layoutX="765.0" layoutY="654.0" mnemonicParsing="false" onAction="#onSettingsButton" text="Настройки" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="240.0" />
+      <Button fx:id="importButton" layoutX="664.0" layoutY="654.0" mnemonicParsing="false" onAction="#onImportButton" text="Из файла" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="355.0" />
     </children>
 </AnchorPane>
