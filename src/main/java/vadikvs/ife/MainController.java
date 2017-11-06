@@ -121,7 +121,7 @@ public class MainController implements Initializable {
             Stage stage = (Stage) closeButton.getScene().getWindow();
             FirmEntity firm = getCurrentFirm();
             dialog.setTitle("Выбрать счета для переделки фирмы: " + firm.getName());
-            dialog.initOwner(stage);
+            //dialog.initOwner(stage);
             Scene scene = new Scene(page);
             dialog.setScene(scene);
             MailController controller = loader.getController();

@@ -15,6 +15,9 @@
     </stylesheets>
     <children>
         <TableView fx:id="mailTableView" layoutX="33.0" layoutY="27.0" onKeyPressed="#onMailSelect" onMouseClicked="#onMailSelect" prefHeight="400.0" prefWidth="1100.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+            <placeholder>
+                <Label text="Загрузка сообщений пожалуйста подождите...."/>
+            </placeholder>
             <columns>
                 <!-- Колонки таблицы -->
                 <TableColumn fx:id="idColumn" prefWidth="50.0" text="№" />
@@ -35,6 +38,6 @@
         <Button fx:id="saveButton" layoutX="891.0" layoutY="407.0" maxHeight="30.0" maxWidth="115.0" minHeight="30.0" minWidth="115.0" mnemonicParsing="false" onAction="#onSaveButton" prefHeight="30.0" text="Сохранить" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="510.0" />
         <Button fx:id="exitButton" layoutX="891.0" layoutY="407.0" maxWidth="65.0" minWidth="65.0" mnemonicParsing="false" onAction="#onExitButton" text="Выход" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
         <Button fx:id="sendButton" layoutX="810.0" layoutY="407.0" mnemonicParsing="false" onAction="#onSendButton" text="Отправить файлы" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
-      <WebView fx:id="emailBody" layoutX="885.0" layoutY="435.0" prefHeight="200.0" prefWidth="443.0" AnchorPane.bottomAnchor="65.0" AnchorPane.rightAnchor="15.0" />
+        <WebView fx:id="emailBody" layoutX="885.0" layoutY="435.0" prefHeight="200.0" prefWidth="443.0" AnchorPane.bottomAnchor="65.0" AnchorPane.rightAnchor="15.0" />
     </children>
 </AnchorPane>
