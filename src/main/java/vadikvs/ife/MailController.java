@@ -74,6 +74,8 @@ public class MailController implements Initializable {
     @FXML
     private Button moreMessageButton;
     @FXML
+    private Button settingsButton;
+    @FXML
     private TableView<MessageEntity> mailTableView;
     @FXML
     private ListView<String> fileListView;
@@ -164,7 +166,19 @@ public class MailController implements Initializable {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
+    
+    @FXML
+    private void onSettingsButton() {
+        try {
+            Settings settings = new Settings();
+            SettingsFormGenerator form = new SettingsFormGenerator(settings);
+            form.show();
+        } catch (Exception e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
 
+        }
+    }
+    
     @FXML
     public void onExitButton() {
         email.disconnect();
