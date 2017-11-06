@@ -16,7 +16,7 @@
     <children>
         <TableView fx:id="mailTableView" layoutX="33.0" layoutY="27.0" onKeyPressed="#onMailSelect" onMouseClicked="#onMailSelect" prefHeight="400.0" prefWidth="1100.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
             <placeholder>
-                <Label text="Загрузка сообщений пожалуйста подождите...."/>
+                <Label text="Загрузка сообщений пожалуйста подождите...." />
             </placeholder>
             <columns>
                 <!-- Колонки таблицы -->
@@ -39,5 +39,6 @@
         <Button fx:id="exitButton" layoutX="891.0" layoutY="407.0" maxWidth="65.0" minWidth="65.0" mnemonicParsing="false" onAction="#onExitButton" text="Выход" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" />
         <Button fx:id="sendButton" layoutX="810.0" layoutY="407.0" mnemonicParsing="false" onAction="#onSendButton" text="Отправить файлы" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
         <WebView fx:id="emailBody" layoutX="885.0" layoutY="435.0" prefHeight="200.0" prefWidth="443.0" AnchorPane.bottomAnchor="65.0" AnchorPane.rightAnchor="15.0" />
+      <Button fx:id="moreMessageButton" layoutX="14.0" layoutY="420.0" mnemonicParsing="false" onAction="#onMoreMessage" prefHeight="31.0" prefWidth="307.0" text="Загрузить еще" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="15.0" />
     </children>
 </AnchorPane>

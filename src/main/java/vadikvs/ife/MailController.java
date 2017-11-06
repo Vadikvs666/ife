@@ -36,6 +36,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 
 /**
  * FXML Controller class
@@ -54,6 +55,7 @@ public class MailController implements Initializable {
     private FirmEntity firm;
     private ParamsEntity param;
     private DataAccessor DA;
+    Integer count_messages;
 
     public void setParam(ParamsEntity param) {
         this.param = param;
@@ -69,6 +71,8 @@ public class MailController implements Initializable {
     private Button deleteButton;
     @FXML
     private Button saveButton;
+    @FXML
+    private Button moreMessageButton;
     @FXML
     private TableView<MessageEntity> mailTableView;
     @FXML
@@ -112,6 +116,7 @@ public class MailController implements Initializable {
         conString += server;
         conString += "/";
         conString += db;
+        count_messages=Integer.valueOf(count);
         DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password_db);
         email = new Email(protocol, host, port, userName, password);
         new Thread(new Runnable() {
@@ -208,7 +213,32 @@ public class MailController implements Initializable {
         }
 
     }
-
+    @FXML
+    public void onMoreMessage(){
+      String count = settings.getValue("countMail");
+      new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Integer start=email.getCountMessagesInFolder("INBOX")-count_messages;
+                    Message[] messages = email.getMoreMessages("INBOX", start,  Integer.valueOf(count));
+                    for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
+                        final int counter = i;
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                messageData.add(new MessageEntity(messages[counter]));
+                            }
+                        });
+                    }
+                } catch (MessagingException ex) {
+                    Logger.getLogger(MailController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }).start();  
+        count_messages+=Integer.valueOf(count);
+    }
+    
     @FXML
     public void onAddFileSelect() {
         AtachmentEntity entity = addedfileListView.getSelectionModel().getSelectedItem();
