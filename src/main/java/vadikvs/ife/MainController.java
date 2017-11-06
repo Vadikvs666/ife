@@ -63,7 +63,11 @@ public class MainController implements Initializable {
     private TextField numberRowTextEdit;
     @FXML
     private TextField maxRowTextFiled;
-
+    private Stage stage;
+    
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
     @FXML
     private void onCloseButton(ActionEvent event) {
         close.emit();
@@ -83,33 +87,7 @@ public class MainController implements Initializable {
         }
     }
 
-    @FXML
-    private void onImportButton() {
-        try {
-            Settings settings = new Settings();
-            FileChooser chooser = new FileChooser();
-            Stage stage = (Stage) closeButton.getScene().getWindow();
-            File file = chooser.showOpenDialog(stage);
-            List<ProductEntity> products = new ArrayList<>();
-            DataExtractor DE = new DataExtractor(file, getCurrentParam());
-            String tempPath=settings.getValue("tempPath");
-            String converterServer=settings.getValue("converterServer");
-            products.addAll(DE.getProductsFromFile(tempPath,converterServer));
-            RequestMaker req = new RequestMaker(products, settings.getValue("server"),
-                    settings.getValue("addition"));
-            BrowserLauncher bl = new BrowserLauncher();
-            JsonMaker jm = new JsonMaker(products);
-            String data = jm.getJson();
-            Float addition = Float.parseFloat(settings.getValue("addition"));
-            Ife ife = new Ife(data, getCurrentFirm().getId(), addition, "");
-            DA.insertIfe(ife);
-            bl.openBrowser(req.getStringWithHash(ife.getHash()),
-                    settings.getValue("browser"));
-        } catch (Exception e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-
-        }
-    }
+    
 
     @FXML
     private void onMailButton() {

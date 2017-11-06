@@ -24,7 +24,9 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
@@ -32,8 +34,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -56,7 +60,7 @@ public class MailController implements Initializable {
     private ParamsEntity param;
     private DataAccessor DA;
     Integer count_messages;
-
+    MainController firmController;
     public void setParam(ParamsEntity param) {
         this.param = param;
     }
@@ -160,6 +164,7 @@ public class MailController implements Initializable {
         mailTableView.setEditable(
                 true);
         addedfileListView.setItems(addData);
+         //setStage((Stage) exitButton.getScene().getWindow());
 
     }
 
@@ -178,10 +183,32 @@ public class MailController implements Initializable {
 
         }
     }
+    @FXML
+    private void onFirmSelectButton(){
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("/fxml/Main.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+            Stage dialog = new Stage();
+            Stage stage = this.stage;
+            dialog.setTitle("Выбрать  фирму");
+            dialog.initOwner(stage);
+            Scene scene = new Scene(page);
+            dialog.setScene(scene);
+            firmController = loader.getController();
+            firmController.setStage(dialog);
+            firmChanged.connect(firmController.firmChanged);
+            dialog.showAndWait();
+        } catch (IOException e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
+
+        }
+    }
     
     @FXML
     public void onExitButton() {
         email.disconnect();
+        Stage stage=(Stage) exitButton.getScene().getWindow();
         stage.close();
     }
 
@@ -317,8 +344,37 @@ public class MailController implements Initializable {
 
     public void onFirmChanged(FirmEntity firm) {
         this.firm = firm;
-        stage.setTitle(firm.getName());
+        setStage((Stage) exitButton.getScene().getWindow());
+        stage.setTitle("Выбрать счета для переделки фирмы: " + firm.getName());
         this.param = DA.getParamsByFirmId(firm.getId());
+    }
+    
+    @FXML
+    private void onImportButton() {
+        try {
+            Settings settings = new Settings();
+            FileChooser chooser = new FileChooser();
+            Stage stage = (Stage) exitButton.getScene().getWindow();
+            File file = chooser.showOpenDialog(stage);
+            List<ProductEntity> products = new ArrayList<>();
+            DataExtractor DE = new DataExtractor(file, param);
+            String tempPath=settings.getValue("tempPath");
+            String converterServer=settings.getValue("converterServer");
+            products.addAll(DE.getProductsFromFile(tempPath,converterServer));
+            RequestMaker req = new RequestMaker(products, settings.getValue("server"),
+                    settings.getValue("addition"));
+            BrowserLauncher bl = new BrowserLauncher();
+            JsonMaker jm = new JsonMaker(products);
+            String data = jm.getJson();
+            Float addition = Float.parseFloat(settings.getValue("addition"));
+            Ife ife = new Ife(data, firm.getId(), addition, "");
+            DA.insertIfe(ife);
+            bl.openBrowser(req.getStringWithHash(ife.getHash()),
+                    settings.getValue("browser"));
+        } catch (Exception e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
+
+        }
     }
 
 }
