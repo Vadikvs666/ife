@@ -147,7 +147,7 @@ public class MailController implements Initializable {
         sendButton.setDisable(
                 true);
         addButton.setDisable(
-                true);
+                false);
         deleteButton.setDisable(
                 true);
         saveButton.setDisable(
@@ -239,22 +239,27 @@ public class MailController implements Initializable {
             }
         }
         if (add) {
-            addData.add(e);
+            if (filename != "") {
+                if (filename != null) {
+                    addData.add(e);
+                    sendButton.setDisable(false);
+                }
+            }
         }
-        addButton.setDisable(true);
-        sendButton.setDisable(false);
+        //addButton.setDisable(true);
+        
     }
 
     @FXML
     public void onFileSelect() {
         //
-        String filename = fileListView.getSelectionModel().selectedItemProperty().getValue();
+        /*String filename = fileListView.getSelectionModel().selectedItemProperty().getValue();
         MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
         if (atachData.size() > 0) {
             if (filename != null) {
                 addButton.setDisable(false);
             }
-        }
+        }*/
 
     }
 
@@ -322,7 +327,7 @@ public class MailController implements Initializable {
     @FXML
     public void onSendButton() {
         if (sendButton.getText().contains("файлы")) {
-                onFirmSelectButton();
+            onFirmSelectButton();
         } else {
             List<ProductEntity> products = new ArrayList<>();
             String tempPath = settings.getValue("tempPath");
@@ -357,7 +362,7 @@ public class MailController implements Initializable {
         this.firm = firm;
         setStage((Stage) exitButton.getScene().getWindow());
         stage.setTitle("Выбрать счета для переделки фирмы: " + firm.getName());
-        sendButton.setText("Отправить: "+firm.getName());
+        sendButton.setText("Отправить: " + firm.getName());
         this.param = DA.getParamsByFirmId(firm.getId());
     }
 
