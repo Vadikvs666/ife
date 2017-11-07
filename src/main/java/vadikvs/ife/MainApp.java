@@ -15,10 +15,9 @@ public class MainApp extends Application {
     public void start(Stage stage) throws Exception {
    
         FXMLLoader loader = new FXMLLoader();
-        Parent root = loader.load(getClass().getResource("/fxml/Main.fxml"));
+        Parent root = loader.load(getClass().getResource("/fxml/Mail.fxml"));
         Scene scene= new Scene(root);
-        scene.getStylesheets().add("/styles/Main.css");      
-        stage.setTitle("Система переделки счетов");
+        stage.setTitle("Выберите фирму");
         stage.setScene(scene);
         stage.show();
         

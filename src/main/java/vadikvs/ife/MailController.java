@@ -5,6 +5,7 @@
  */
 package vadikvs.ife;
 
+import com.vadikvs.Signalslots.Signal;
 import com.vadikvs.Signalslots.Slot;
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +25,9 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
@@ -32,10 +35,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 
 /**
  * FXML Controller class
@@ -44,6 +50,7 @@ import javax.mail.Message;
  */
 public class MailController implements Initializable {
 
+    public Signal close = new Signal();
     public Slot closeAction = new Slot(this, "onExitButton");
     public Slot firmChanged = new Slot(this, "onFirmChanged");
     private final ObservableList<MessageEntity> messageData = FXCollections.observableArrayList();
@@ -54,6 +61,8 @@ public class MailController implements Initializable {
     private FirmEntity firm;
     private ParamsEntity param;
     private DataAccessor DA;
+    Integer count_messages;
+    MainController firmController;
 
     public void setParam(ParamsEntity param) {
         this.param = param;
@@ -69,6 +78,10 @@ public class MailController implements Initializable {
     private Button deleteButton;
     @FXML
     private Button saveButton;
+    @FXML
+    private Button moreMessageButton;
+    @FXML
+    private Button settingsButton;
     @FXML
     private TableView<MessageEntity> mailTableView;
     @FXML
@@ -112,6 +125,7 @@ public class MailController implements Initializable {
         conString += server;
         conString += "/";
         conString += db;
+        count_messages = Integer.valueOf(count);
         DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password_db);
         email = new Email(protocol, host, port, userName, password);
         new Thread(new Runnable() {
@@ -161,8 +175,43 @@ public class MailController implements Initializable {
     }
 
     @FXML
+    private void onSettingsButton() {
+        try {
+            Settings settings = new Settings();
+            SettingsFormGenerator form = new SettingsFormGenerator(settings);
+            form.show();
+        } catch (Exception e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
+
+        }
+    }
+
+    @FXML
+    private void onFirmSelectButton() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("/fxml/Main.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+            Stage dialog = new Stage();
+            dialog.setTitle("Выбрать  фирму");
+            Scene scene = new Scene(page);
+            dialog.setScene(scene);
+            firmController = loader.getController();
+            firmController.setStage(dialog);
+            firmChanged.connect(firmController.firmChanged);
+            close.connect(firmController.closeAction);
+            dialog.showAndWait();
+        } catch (IOException e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
+
+        }
+    }
+
+    @FXML
     public void onExitButton() {
         email.disconnect();
+        close.emit();
+        Stage stage = (Stage) exitButton.getScene().getWindow();
         stage.close();
     }
 
@@ -210,6 +259,32 @@ public class MailController implements Initializable {
     }
 
     @FXML
+    public void onMoreMessage() {
+        String count = settings.getValue("countMail");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Integer start = email.getCountMessagesInFolder("INBOX") - count_messages;
+                    Message[] messages = email.getMoreMessages("INBOX", start, Integer.valueOf(count));
+                    for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
+                        final int counter = i;
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                messageData.add(new MessageEntity(messages[counter]));
+                            }
+                        });
+                    }
+                } catch (MessagingException ex) {
+                    Logger.getLogger(MailController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }).start();
+        count_messages += Integer.valueOf(count);
+    }
+
+    @FXML
     public void onAddFileSelect() {
         AtachmentEntity entity = addedfileListView.getSelectionModel().getSelectedItem();
         if (entity != null) {
@@ -246,25 +321,32 @@ public class MailController implements Initializable {
 
     @FXML
     public void onSendButton() {
-        List<ProductEntity> products = new ArrayList<>();
-        String tempPath=settings.getValue("tempPath");
-        String converterServer=settings.getValue("converterServer");
-        for (int i = 0; i < addData.size(); i++) {
-            AtachmentEntity entity = addData.get(i);
-            DataExtractor DE = new DataExtractor(entity, param);
-            products.addAll(DE.getProductsFromFile(tempPath,converterServer));
+        if (sendButton.getText().contains("файлы")) {
+                onFirmSelectButton();
+        } else {
+            List<ProductEntity> products = new ArrayList<>();
+            String tempPath = settings.getValue("tempPath");
+            String converterServer = settings.getValue("converterServer");
+            for (int i = 0; i < addData.size(); i++) {
+                AtachmentEntity entity = addData.get(i);
+                DataExtractor DE = new DataExtractor(entity, param);
+                products.addAll(DE.getProductsFromFile(tempPath, converterServer));
+            }
+            RequestMaker req = new RequestMaker(products, settings.getValue("server"),
+                    settings.getValue("addition"));
+            BrowserLauncher bl = new BrowserLauncher();
+            JsonMaker jm = new JsonMaker(products);
+            String data = jm.getJson();
+            Float addition = Float.parseFloat(settings.getValue("addition"));
+            Ife ife = new Ife(data, firm.getId(), addition, "");
+            DA.insertIfe(ife);
+            bl.openBrowser(req.getStringWithHash(ife.getHash()),
+                    settings.getValue("browser"));
+            sendButton.setDisable(true);
+            deleteButton.setDisable(true);
+            saveButton.setDisable(true);
+            addData.clear();
         }
-        RequestMaker req = new RequestMaker(products, settings.getValue("server"),
-                settings.getValue("addition"));
-        BrowserLauncher bl = new BrowserLauncher();
-        JsonMaker jm = new JsonMaker(products);
-        String data = jm.getJson();
-        Float addition = Float.parseFloat(settings.getValue("addition"));
-        Ife ife = new Ife(data, firm.getId(), addition, "");
-        DA.insertIfe(ife);
-        bl.openBrowser(req.getStringWithHash(ife.getHash()),
-                settings.getValue("browser"));
-        sendButton.setDisable(true);
     }
 
     public void setFirm(FirmEntity firm) {
@@ -273,8 +355,38 @@ public class MailController implements Initializable {
 
     public void onFirmChanged(FirmEntity firm) {
         this.firm = firm;
-        stage.setTitle(firm.getName());
+        setStage((Stage) exitButton.getScene().getWindow());
+        stage.setTitle("Выбрать счета для переделки фирмы: " + firm.getName());
+        sendButton.setText("Отправить: "+firm.getName());
         this.param = DA.getParamsByFirmId(firm.getId());
+    }
+
+    @FXML
+    private void onImportButton() {
+        try {
+            Settings settings = new Settings();
+            FileChooser chooser = new FileChooser();
+            Stage stage = (Stage) exitButton.getScene().getWindow();
+            File file = chooser.showOpenDialog(stage);
+            List<ProductEntity> products = new ArrayList<>();
+            DataExtractor DE = new DataExtractor(file, param);
+            String tempPath = settings.getValue("tempPath");
+            String converterServer = settings.getValue("converterServer");
+            products.addAll(DE.getProductsFromFile(tempPath, converterServer));
+            RequestMaker req = new RequestMaker(products, settings.getValue("server"),
+                    settings.getValue("addition"));
+            BrowserLauncher bl = new BrowserLauncher();
+            JsonMaker jm = new JsonMaker(products);
+            String data = jm.getJson();
+            Float addition = Float.parseFloat(settings.getValue("addition"));
+            Ife ife = new Ife(data, firm.getId(), addition, "");
+            DA.insertIfe(ife);
+            bl.openBrowser(req.getStringWithHash(ife.getHash()),
+                    settings.getValue("browser"));
+        } catch (Exception e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
+
+        }
     }
 
 }

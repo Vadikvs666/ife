@@ -130,4 +130,22 @@ public class DataAccessor {
         }
         return false;
     }
+
+    List<FirmEntity> getFirmListLikeName(String text) {
+         try {
+            Statement statement = connection.createStatement();
+            ResultSet result_set = statement.executeQuery("select * from firms where LOWER(name) LIKE LOWER('%"+text+"%')");
+            List<FirmEntity> firmList = new ArrayList<>();
+            while (result_set.next()) {
+                String id = result_set.getString("id");
+                String name = result_set.getString("name");
+                FirmEntity firm = new FirmEntity(Integer.valueOf(id), name);
+                firmList.add(firm);
+            }
+            return firmList;
+        } catch (SQLException ex) {
+            Logger.getLogger(DataAccessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 }

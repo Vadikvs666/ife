@@ -86,6 +86,19 @@ public class Email {
         }
         return null;
     }
+    
+    public Message[] getMoreMessages(String folder, Integer start,Integer count) {
+        try {
+            folderInbox = store.getFolder(folder);
+            folderInbox.open(Folder.READ_ONLY);
+            int end = folderInbox.getMessageCount();
+            Message[] messages = folderInbox.getMessages(start + 1, end);
+            return messages;
+        } catch (MessagingException ex) {
+            System.out.println("Could not open messages folder");
+        }
+        return null;
+    }
 
     public void disconnect() {
         try {

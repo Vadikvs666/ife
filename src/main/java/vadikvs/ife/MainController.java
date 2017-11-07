@@ -1,28 +1,26 @@
 package vadikvs.ife;
 
 import com.vadikvs.Signalslots.Signal;
-import java.io.File;
-import java.io.IOException;
+import com.vadikvs.Signalslots.Slot;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.FileChooser;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 public class MainController implements Initializable {
@@ -30,15 +28,10 @@ public class MainController implements Initializable {
     private ObservableList<FirmEntity> firmData = FXCollections.observableArrayList();
     public Signal close = new Signal();
     public Signal firmChanged = new Signal();
+    public Slot closeAction = new Slot(this, "onCloseButton");
     private DataAccessor DA;
     @FXML
     private Button closeButton;
-    @FXML
-    private Button settingsButton;
-    @FXML
-    private Button importButton;
-    @FXML
-    private Button mailButton;
     @FXML
     private Button saveParamButton;
     @FXML
@@ -63,78 +56,22 @@ public class MainController implements Initializable {
     private TextField numberRowTextEdit;
     @FXML
     private TextField maxRowTextFiled;
+    @FXML
+    private TextField searchText;
+    private Stage stage;
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
 
     @FXML
-    private void onCloseButton(ActionEvent event) {
+    public void onCloseButton() {
         close.emit();
+        FirmEntity entity = getCurrentFirm();
+        Object[] args = {entity};
+        firmChanged.emit(args);
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
-    }
-
-    @FXML
-    private void onSettingsButton() {
-        try {
-            Settings settings = new Settings();
-            SettingsFormGenerator form = new SettingsFormGenerator(settings);
-            form.show();
-        } catch (Exception e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-
-        }
-    }
-
-    @FXML
-    private void onImportButton() {
-        try {
-            Settings settings = new Settings();
-            FileChooser chooser = new FileChooser();
-            Stage stage = (Stage) closeButton.getScene().getWindow();
-            File file = chooser.showOpenDialog(stage);
-            List<ProductEntity> products = new ArrayList<>();
-            DataExtractor DE = new DataExtractor(file, getCurrentParam());
-            String tempPath=settings.getValue("tempPath");
-            String converterServer=settings.getValue("converterServer");
-            products.addAll(DE.getProductsFromFile(tempPath,converterServer));
-            RequestMaker req = new RequestMaker(products, settings.getValue("server"),
-                    settings.getValue("addition"));
-            BrowserLauncher bl = new BrowserLauncher();
-            JsonMaker jm = new JsonMaker(products);
-            String data = jm.getJson();
-            Float addition = Float.parseFloat(settings.getValue("addition"));
-            Ife ife = new Ife(data, getCurrentFirm().getId(), addition, "");
-            DA.insertIfe(ife);
-            bl.openBrowser(req.getStringWithHash(ife.getHash()),
-                    settings.getValue("browser"));
-        } catch (Exception e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-
-        }
-    }
-
-    @FXML
-    private void onMailButton() {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("/fxml/Mail.fxml"));
-            AnchorPane page = (AnchorPane) loader.load();
-            Stage dialog = new Stage();
-            Stage stage = (Stage) closeButton.getScene().getWindow();
-            FirmEntity firm = getCurrentFirm();
-            dialog.setTitle("Выбрать счета для переделки фирмы: " + firm.getName());
-            dialog.initOwner(stage);
-            Scene scene = new Scene(page);
-            dialog.setScene(scene);
-            MailController controller = loader.getController();
-            controller.setStage(dialog);
-            controller.setFirm(firm);
-            controller.setParam(getCurrentParam());
-            close.connect(controller.closeAction);
-            firmChanged.connect(controller.firmChanged);
-            dialog.showAndWait();
-        } catch (IOException e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-
-        }
     }
 
     @FXML
@@ -161,28 +98,54 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+
+        try {
+            getAllFrimFromDB();
+            onFirmSelect();
+        } catch (Exception ex) {
+            Settings settings = new Settings();
+            SettingsFormGenerator form = new SettingsFormGenerator(settings);
+            form.show();
+        }
+
+    }
+
+    private void getAllFrimFromDB() {
         Settings settings = new Settings();
         String server = settings.getValue("server");
         String user = settings.getValue("user");
         String db = settings.getValue("database");
         String password = settings.getValue("password");
-        try {
-            String conString = "jdbc:mysql://";
-            conString += server;
-            conString += "/";
-            conString += db;
-            this.DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password);
-            List<FirmEntity> list = DA.getFirmList();
-            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-            nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-            firmData = FXCollections.observableArrayList(list);
-            firmTableView.setItems(firmData);
-            firmTableView.getSelectionModel().select(0);
-            onFirmSelect();
-        } catch (Exception ex) {
-            // onSaveParamButton();
-        }
+        String conString = "jdbc:mysql://";
+        conString += server;
+        conString += "/";
+        conString += db;
+        this.DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password);
+        List<FirmEntity> list = DA.getFirmList();
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        firmData = FXCollections.observableArrayList(list);
+        firmTableView.setItems(firmData);
+        firmTableView.getSelectionModel().select(0);
+    }
 
+    private void getFirmFromDBLikeName(String name) {
+        Settings settings = new Settings();
+        String server = settings.getValue("server");
+        String user = settings.getValue("user");
+        String db = settings.getValue("database");
+        String password = settings.getValue("password");
+        String conString = "jdbc:mysql://";
+        conString += server;
+        conString += "/";
+        conString += db;
+        this.DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password);
+        List<FirmEntity> list = DA.getFirmListLikeName(name);
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        firmData = FXCollections.observableArrayList(list);
+        firmTableView.setItems(firmData);
+        firmTableView.getSelectionModel().select(0);
     }
 
     public void onFirmSelect() {
@@ -216,7 +179,31 @@ public class MainController implements Initializable {
         firmChanged.emit(args);
         return DA.getParamsByFirmId(entity.getId());
     }
-    private FirmEntity getCurrentFirm(){
+
+    private FirmEntity getCurrentFirm() {
         return firmTableView.getSelectionModel().selectedItemProperty().getValue();
+    }
+
+    @FXML
+    public void onSearch(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            getFirmFromDBLikeName(searchText.textProperty().get().toLowerCase());
+        }
+    }
+
+    private void initFilter() {
+        searchText.textProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if (searchText.textProperty().get().isEmpty()) {
+                    getAllFrimFromDB();
+                    return;
+                } else {
+                    getFirmFromDBLikeName(searchText.textProperty().get().toLowerCase());
+                }
+
+            }
+        });
+
     }
 }
