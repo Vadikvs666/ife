@@ -45,7 +45,7 @@ public class DataExtractor {
             String name = excell.getData(row, name_col);
             String count = excell.getData(row, count_col);
             String summ = excell.getData(row, summ_col);
-            if(count!=""){
+            if(count!=""&&name!=""&&summ!=""){
                 System.out.println("artikul: "+artikul+" name :"+name+" count: "+count+" summ: "+summ);
                 String preparedSumm=Utility.prepareNumeric(summ);
                 
