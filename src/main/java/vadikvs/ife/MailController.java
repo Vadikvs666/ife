@@ -231,13 +231,13 @@ public class MailController implements Initializable {
         MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
         AtachmentEntity e = new AtachmentEntity(filename, entity);
         boolean add = true;
-        for (int i = 0; i < addData.size(); i++) {
+       /* for (int i = 0; i < addData.size(); i++) {
             AtachmentEntity it = addData.get(i);
             if ((Objects.equals(e.getMessageId(), it.getMessageId()))
                     && e.getFilename().equals(it.getFilename())) {
                 add = false;
             }
-        }
+        }*/
         if (add) {
             if (filename != "") {
                 if (filename != null) {
