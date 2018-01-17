@@ -128,7 +128,21 @@ public class MailController implements Initializable {
         count_messages = Integer.valueOf(count);
         DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password_db);
         email = new Email(protocol, host, port, userName, password);
-        new Thread(new Runnable() {
+        new Thread(() -> {
+            try {
+                Message[] messages = email.getMessages("INBOX", Integer.valueOf(count));
+                for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
+                    final int counter = i;
+                    messageData.add(new MessageEntity(messages[counter]));
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        /* new Thread(
+                new Runnable() {
             @Override
             public void run() {
                 Message[] messages = email.getMessages("INBOX", Integer.valueOf(count));
@@ -142,8 +156,8 @@ public class MailController implements Initializable {
                     });
                 }
             }
-        }).start();
-
+        }
+        ).start();*/
         sendButton.setDisable(
                 true);
         addButton.setDisable(
@@ -180,8 +194,10 @@ public class MailController implements Initializable {
             Settings settings = new Settings();
             SettingsFormGenerator form = new SettingsFormGenerator(settings);
             form.show();
+
         } catch (Exception e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(MainController.class
+                    .getName()).log(Level.SEVERE, null, e);
 
         }
     }
@@ -190,7 +206,9 @@ public class MailController implements Initializable {
     private void onFirmSelectButton() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("/fxml/Main.fxml"));
+            loader
+                    .setLocation(MainApp.class
+                            .getResource("/fxml/Main.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
             Stage dialog = new Stage();
             dialog.setTitle("Выбрать  фирму");
@@ -201,8 +219,10 @@ public class MailController implements Initializable {
             firmChanged.connect(firmController.firmChanged);
             close.connect(firmController.closeAction);
             dialog.showAndWait();
+
         } catch (IOException e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(MainController.class
+                    .getName()).log(Level.SEVERE, null, e);
 
         }
     }
@@ -231,7 +251,7 @@ public class MailController implements Initializable {
         MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
         AtachmentEntity e = new AtachmentEntity(filename, entity);
         boolean add = true;
-       /* for (int i = 0; i < addData.size(); i++) {
+        /* for (int i = 0; i < addData.size(); i++) {
             AtachmentEntity it = addData.get(i);
             if ((Objects.equals(e.getMessageId(), it.getMessageId()))
                     && e.getFilename().equals(it.getFilename())) {
@@ -247,7 +267,7 @@ public class MailController implements Initializable {
             }
         }
         //addButton.setDisable(true);
-        
+
     }
 
     @FXML
@@ -266,25 +286,22 @@ public class MailController implements Initializable {
     @FXML
     public void onMoreMessage() {
         String count = settings.getValue("countMail");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Integer start = email.getCountMessagesInFolder("INBOX") - count_messages;
-                    Message[] messages = email.getMoreMessages("INBOX", start, Integer.valueOf(count));
-                    for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
-                        final int counter = i;
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                messageData.add(new MessageEntity(messages[counter]));
-                            }
-                        });
-                    }
-                } catch (MessagingException ex) {
-                    Logger.getLogger(MailController.class.getName()).log(Level.SEVERE, null, ex);
+        new Thread(() -> {
+
+            try {
+                Integer start = email.getCountMessagesInFolder("INBOX") - count_messages;
+                Message[] messages = email.getMoreMessages("INBOX", start, Integer.valueOf(count));
+                for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
+                    final int counter = i;
+
+                    messageData.add(new MessageEntity(messages[counter]));
                 }
+
+            } catch (MessagingException ex) {
+                Logger.getLogger(MailController.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
+
         }).start();
         count_messages += Integer.valueOf(count);
     }
@@ -388,8 +405,10 @@ public class MailController implements Initializable {
             DA.insertIfe(ife);
             bl.openBrowser(req.getStringWithHash(ife.getHash()),
                     settings.getValue("browser"));
+
         } catch (Exception e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(MainController.class
+                    .getName()).log(Level.SEVERE, null, e);
 
         }
     }
