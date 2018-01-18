@@ -45,6 +45,7 @@ public class ProductsList {
                     it.setCount(count);
                     it.setPrice(summ / count);
                     exist = true;
+                    break;
                 }
             }
         }

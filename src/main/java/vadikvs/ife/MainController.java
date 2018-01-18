@@ -22,6 +22,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import javax.mail.Message;
+import javax.mail.MessagingException;
 
 public class MainController implements Initializable {
 
@@ -100,8 +102,10 @@ public class MainController implements Initializable {
         // TODO
 
         try {
-            getAllFrimFromDB();
-            onFirmSelect();
+            new Thread(() -> {
+                getAllFrimFromDB();
+                onFirmSelect();
+            }).start();
         } catch (Exception ex) {
             Settings settings = new Settings();
             SettingsFormGenerator form = new SettingsFormGenerator(settings);
