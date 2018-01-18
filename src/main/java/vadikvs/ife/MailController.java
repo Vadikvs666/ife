@@ -346,7 +346,7 @@ public class MailController implements Initializable {
         if (sendButton.getText().contains("файлы")) {
             onFirmSelectButton();
         } else {
-            List<ProductEntity> products = new ArrayList<>();
+            ProductsList products = new ProductsList();
             String tempPath = settings.getValue("tempPath");
             String converterServer = settings.getValue("converterServer");
             for (int i = 0; i < addData.size(); i++) {
@@ -354,10 +354,10 @@ public class MailController implements Initializable {
                 DataExtractor DE = new DataExtractor(entity, param);
                 products.addAll(DE.getProductsFromFile(tempPath, converterServer));
             }
-            RequestMaker req = new RequestMaker(products, settings.getValue("server"),
+            RequestMaker req = new RequestMaker(products.get(), settings.getValue("server"),
                     settings.getValue("addition"));
             BrowserLauncher bl = new BrowserLauncher();
-            JsonMaker jm = new JsonMaker(products);
+            JsonMaker jm = new JsonMaker(products.get());
             String data = jm.getJson();
             Float addition = Float.parseFloat(settings.getValue("addition"));
             Ife ife = new Ife(data, firm.getId(), addition, "");
