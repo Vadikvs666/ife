@@ -62,6 +62,8 @@ public class Email {
         props.put(
                 String.format("mail.%s.socketFactory", protocol),
                 socketFactory);
+        props.put(String.format("mail.%s.closefoldersonstorefailure", protocol), false);
+        
         return props;
     }
 
