@@ -100,7 +100,11 @@ public class MailController implements Initializable {
     private TableColumn<AtachmentEntity, String> addColumn;
     @FXML
     private WebView emailBody;
+    @FXML
+    private TextField textAddition;
     private Settings settings;
+    
+    public Slot settingsChanged = new Slot(this, "settingChangeds");
 
     /**
      * Initializes the controller class.
@@ -111,6 +115,7 @@ public class MailController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         settings = new Settings();
+        
         String protocol = settings.getValue("protocol");
         String host = settings.getValue("serverMail");
         String port = settings.getValue("portMail");
@@ -121,6 +126,7 @@ public class MailController implements Initializable {
         String user = settings.getValue("user");
         String db = settings.getValue("database");
         String password_db = settings.getValue("password");
+        textAddition.setText( settings.getValue("addition"));
         String conString = "jdbc:mysql://";
         conString += server;
         conString += "/";
@@ -187,11 +193,15 @@ public class MailController implements Initializable {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-
+     public void settingChangeds(){
+         System.out.println("vadikvs.ife.MailController.settingChangeds()");
+        textAddition.setText( settings.getValue("addition"));
+     }
     @FXML
     private void onSettingsButton() {
         try {
             Settings settings = new Settings();
+            settingsChanged.connect(settings.changed);
             SettingsFormGenerator form = new SettingsFormGenerator(settings);
             form.show();
 
@@ -355,11 +365,11 @@ public class MailController implements Initializable {
                 products.addAll(DE.getProductsFromFile(tempPath, converterServer));
             }
             RequestMaker req = new RequestMaker(products.get(), settings.getValue("server"),
-                    settings.getValue("addition"));
+                    textAddition.getText());
             BrowserLauncher bl = new BrowserLauncher();
             JsonMaker jm = new JsonMaker(products.get());
             String data = jm.getJson();
-            Float addition = Float.parseFloat(settings.getValue("addition"));
+            Float addition = Float.parseFloat(textAddition.getText());
             Ife ife = new Ife(data, firm.getId(), addition, "");
             DA.insertIfe(ife);
             bl.openBrowser(req.getStringWithHash(ife.getHash()),
@@ -396,11 +406,11 @@ public class MailController implements Initializable {
             String converterServer = settings.getValue("converterServer");
             products.addAll(DE.getProductsFromFile(tempPath, converterServer));
             RequestMaker req = new RequestMaker(products, settings.getValue("server"),
-                    settings.getValue("addition"));
+                    textAddition.getText());
             BrowserLauncher bl = new BrowserLauncher();
             JsonMaker jm = new JsonMaker(products);
             String data = jm.getJson();
-            Float addition = Float.parseFloat(settings.getValue("addition"));
+            Float addition = Float.parseFloat(textAddition.getText());
             Ife ife = new Ife(data, firm.getId(), addition, "");
             DA.insertIfe(ife);
             bl.openBrowser(req.getStringWithHash(ife.getHash()),
