@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import com.vadikvs.Signalslots.Signal;
 
 /**
  *
@@ -19,7 +20,7 @@ public class Settings {
 
 
     private SettingList settings;
-
+    public Signal changed = new Signal();
     
 
     public Settings() {
@@ -60,6 +61,7 @@ public class Settings {
         Preferences prefs = Preferences.userNodeForPackage(MainApp.class);
         if (settings.setValue(name, value)) {
             prefs.put(name, value);
+            changed.emit();
             return true;
         }
         return false;
