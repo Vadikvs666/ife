@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
@@ -46,9 +47,11 @@
             <Font name="System Bold" size="15.0" />
          </font></Button>
         <WebView fx:id="emailBody" layoutX="885.0" layoutY="435.0" prefHeight="200.0" prefWidth="443.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="650.0" AnchorPane.rightAnchor="15.0" />
-      <Button fx:id="moreMessageButton" layoutX="14.0" layoutY="420.0" mnemonicParsing="false" onAction="#onMoreMessage" prefHeight="31.0" prefWidth="307.0" text="Загрузить больше сообщений" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="15.0" />
+      <Button fx:id="moreMessageButton" layoutX="14.0" layoutY="420.0" mnemonicParsing="false" onAction="#onMoreMessage" prefHeight="31.0" prefWidth="230.0" text="Загрузить больше сообщений" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="15.0" />
       <Button fx:id="firmSelectButton" layoutX="876.0" layoutY="654.0" mnemonicParsing="false" onAction="#onFirmSelectButton" text="Выбрать фирму" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="95.0" />
       <Button fx:id="settingsButton" layoutX="765.0" layoutY="654.0" mnemonicParsing="false" onAction="#onSettingsButton" text="Настройки" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="240.0" />
       <Button fx:id="importButton" layoutX="664.0" layoutY="654.0" mnemonicParsing="false" onAction="#onImportButton" text="Из файла" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="355.0" />
+      <Label layoutX="447.0" layoutY="424.0" text="Наценка:" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="445.0" />
+      <TextField fx:id="textAddition" layoutX="515.0" layoutY="420.0" prefHeight="31.0" prefWidth="128.0" text="30" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="515.0" />
     </children>
 </AnchorPane>
