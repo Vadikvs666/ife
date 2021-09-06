@@ -95,11 +95,11 @@ public class Settings {
         settings.add(countMAil);
         Setting  tempPath= new Setting("tempPath", "Временныя папка: ", "temp");
         settings.add(tempPath);
-        Setting  browser= new Setting("browser", "Путь к браузеру: ", "opera");
+        Setting  browser= new Setting("browser", "Путь к браузеру: ", "firefox");
         settings.add(browser);
         Setting  addtition= new Setting("addition", "Наценка: ", "30");
         settings.add(addtition);
-        Setting  converterServer= new Setting("converterServer", "сервер конвертирования файлов: ", "in.hoz.center/converttoxlsx");
+        Setting  converterServer= new Setting("converterServer", "сервер конвертирования файлов: ", "http://convert.hoz.center/converttoxlxs");
         settings.add(converterServer);
 
     }
