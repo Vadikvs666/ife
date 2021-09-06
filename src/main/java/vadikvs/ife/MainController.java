@@ -119,9 +119,10 @@ public class MainController implements Initializable {
         String server = settings.getValue("server");
         String user = settings.getValue("user");
         String db = settings.getValue("database");
+        String port = settings.getValue("port");
         String password = settings.getValue("password");
         String conString = "jdbc:mysql://";
-        conString += server;
+        conString += server+":"+port;
         conString += "/";
         conString += db;
         this.DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password);

@@ -77,6 +77,8 @@ public class Settings {
         settings.add(db);
         Setting sever = new Setting("server", "Сервер: ", "");
         settings.add(sever);
+        Setting port = new Setting("port", "Порт: ", "3306");
+        settings.add(port);
         Setting user = new Setting("user", "Имя пользователя: ", "");
         settings.add(user);
         Setting pass = new Setting("password", "Пароль: ", "");
