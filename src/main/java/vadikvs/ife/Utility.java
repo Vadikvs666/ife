@@ -27,6 +27,8 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import javafx.scene.control.Alert;
+import javafx.application.Platform;
 
 /**
  *
@@ -110,4 +112,16 @@ public class Utility {
         File targetFile = new File(path + File.separatorChar + filename);
         return targetFile;
     }
+    
+    public static void showAlert(String title,String header,String msg) {
+    Platform.runLater(new Runnable() {
+      public void run() {
+          Alert alert = new Alert(Alert.AlertType.INFORMATION);
+          alert.setTitle(title);
+          alert.setHeaderText(header);
+          alert.setContentText(msg);
+          alert.showAndWait();
+      }
+    });
+}
 }
