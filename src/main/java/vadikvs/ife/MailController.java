@@ -131,6 +131,7 @@ public class MailController implements Initializable {
         conString += server;
         conString += "/";
         conString += db;
+        conString += "?useSSL=false";
         count_messages = Integer.valueOf(count);
         DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password_db);
         email = new Email(protocol, host, port, userName, password);

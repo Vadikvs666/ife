@@ -125,6 +125,7 @@ public class MainController implements Initializable {
         conString += server+":"+port;
         conString += "/";
         conString += db;
+        conString += "?useSSL=false";
         this.DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password);
         List<FirmEntity> list = DA.getFirmList();
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -145,6 +146,7 @@ public class MainController implements Initializable {
         conString += server+":"+port;
         conString += "/";
         conString += db;
+        conString += "?useSSL=false";
         this.DA = new DataAccessor("com.mysql.jdbc.Driver", conString, user, password);
         List<FirmEntity> list = DA.getFirmListLikeName(name);
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
