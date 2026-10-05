@@ -24,12 +24,13 @@ public class DataExtractor {
         this.atach = null;
     }
 
-    public List<ProductEntity> getProductsFromFile(String tempPath) throws IOException {
+    public List<ProductEntity> getProductsFromFile(String tempPath, String converterServer) throws IOException {
         if (param == null) {
             throw new IOException("Сначала выберите фирму и параметры импорта.");
         }
         File source = file;
         Path temporaryDirectory = null;
+        File converted = null;
         try {
             if (source == null) {
                 if (atach == null) {
@@ -41,7 +42,13 @@ public class DataExtractor {
                 source = atach.saveAtach(temporaryDirectory.toString());
             }
             List<ProductEntity> list = new ArrayList<>();
-            try (ExcellWorker excell = new ExcellWorker(source)) {
+            File excelFile = source;
+            // Preserve the original import route: only XLSX is read directly.
+            if (!Utility.getFileExtensions(source).equalsIgnoreCase("xlsx")) {
+                converted = ExcelConverter.convert(source, converterServer, tempPath);
+                excelFile = converted;
+            }
+            try (ExcellWorker excell = new ExcellWorker(excelFile)) {
                 for (int row = param.getStart_row(); row < param.getMax_row(); row++) {
                     String artikul = excell.getData(row, param.getArtikul_col());
                     String name = excell.getData(row, param.getName_col());
@@ -60,6 +67,9 @@ public class DataExtractor {
             }
             return list;
         } finally {
+            if (converted != null) {
+                Files.deleteIfExists(converted.toPath());
+            }
             if (temporaryDirectory != null) {
                 if (source != null) {
                     Files.deleteIfExists(source.toPath());

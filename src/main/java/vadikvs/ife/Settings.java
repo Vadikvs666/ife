@@ -101,6 +101,8 @@ public class Settings {
         settings.add(browser);
         Setting  addtition= new Setting("addition", "Наценка: ", "30");
         settings.add(addtition);
+        settings.add(new Setting("converterServer", "Сервер конвертирования файлов: ",
+                "http://convert.hoz.center/converttoxlxs"));
 
     }
 

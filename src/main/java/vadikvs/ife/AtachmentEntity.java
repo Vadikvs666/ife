@@ -26,7 +26,7 @@ public class AtachmentEntity {
     }
 
     public String getFilename() {
-        return entryName == null ? attachmentName : attachmentName + " → " + entryName;
+        return entryName == null ? attachmentName : attachmentName + "/" + entryName.replace('\\', '/');
     }
 
     public Integer getMessageId() {

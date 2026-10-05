@@ -369,7 +369,7 @@ public class MailController implements Initializable {
                 AtachmentEntity entity = addData.get(i);
                 DataExtractor DE = new DataExtractor(entity, param);
                 try {
-                    products.addAll(DE.getProductsFromFile(tempPath));
+                    products.addAll(DE.getProductsFromFile(tempPath, settings.getValue("converterServer")));
                 } catch (IOException ex) {
                     Utility.showAlert("Ошибка импорта", "Файл не обработан", ex.getMessage());
                     return;
@@ -417,7 +417,7 @@ public class MailController implements Initializable {
             List<ProductEntity> products = new ArrayList<>();
             DataExtractor DE = new DataExtractor(file, param);
             String tempPath = settings.getValue("tempPath");
-            products.addAll(DE.getProductsFromFile(tempPath));
+            products.addAll(DE.getProductsFromFile(tempPath, settings.getValue("converterServer")));
             RequestMaker req = new RequestMaker(products, settings.getValue("server"),
                     textAddition.getText());
             BrowserLauncher bl = new BrowserLauncher();

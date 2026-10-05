@@ -3,6 +3,9 @@ package vadikvs.ife;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicInteger;
+import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +40,7 @@ public class AttachmentImportTest {
         AttachmentReader.Result result = message.loadAttachments();
         assertTrue(result.warnings.toString(), result.warnings.isEmpty());
         assertEquals(2, result.files.size()); // The original archive plus its file.
-        assertEquals("Счета.ZIP → счета/счёт.xls", result.files.get(1).getFilename());
+        assertEquals("Счета.ZIP/счета/счёт.xls", result.files.get(1).getFilename());
         assertSame(result, message.loadAttachments());
         File saved = result.files.get(1).saveAtach(temporary.newFolder().getPath());
         assertEquals("счёт.xls", saved.getName());
@@ -119,14 +122,22 @@ public class AttachmentImportTest {
         }
     }
 
-    @Test public void importsXlsAndXlsxFromZipWithoutConverterAndCleansTemporaryFiles() throws Exception {
+    @Test public void importsXlsThroughServerAndXlsxLocallyFromZip() throws Exception {
         for (boolean xlsx : new boolean[]{false, true}) {
             String name = xlsx ? "invoice.xlsx" : "invoice.xls";
             AtachmentEntity item = AttachmentReader.read(message(attachment("invoices.zip",
                     zip(StandardCharsets.UTF_8, new String[]{name}, new byte[][]{workbook(xlsx)}))), null)
                     .files.get(1);
             File directory = temporary.newFolder();
-            List<ProductEntity> products = new DataExtractor(item, params()).getProductsFromFile(directory.getPath());
+            List<ProductEntity> products;
+            try (ConverterServer server = new ConverterServer(200, workbook(true))) {
+                products = new DataExtractor(item, params()).getProductsFromFile(directory.getPath(), server.url());
+                assertEquals(xlsx ? 0 : 1, server.requests.get());
+                if (!xlsx) {
+                    assertTrue(server.request.contains("name=\"file\""));
+                    assertTrue(server.request.contains("filename=\"invoice.xls\""));
+                }
+            }
             assertEquals(1, products.size());
             assertEquals("00123", products.get(0).getArticul());
             assertEquals("Товар", products.get(0).getName());
@@ -147,24 +158,108 @@ public class AttachmentImportTest {
                 assertEquals("", excel.getData(2, 10));
             }
             assertArrayEquals(bytes, Files.readAllBytes(file.toPath()));
-            assertEquals(1, new DataExtractor(file, params()).getProductsFromFile("unused").size());
+            File directory = temporary.newFolder();
+            try (ConverterServer server = new ConverterServer(200, workbook(true))) {
+                assertEquals(1, new DataExtractor(file, params())
+                        .getProductsFromFile(directory.getPath(), server.url()).size());
+                assertEquals(xlsx ? 0 : 1, server.requests.get());
+            }
+            assertArrayEquals(bytes, Files.readAllBytes(file.toPath()));
+            assertEquals(0, directory.list().length);
         }
     }
 
     @Test public void invalidExcelAbortsImportAndCleansExtractedFile() throws Exception {
         AtachmentEntity item = AttachmentReader.read(message(attachment("bad.zip",
-                zip(StandardCharsets.UTF_8, new String[]{"bad.xls"}, new byte[][]{{1, 2, 3}}))), null)
+                zip(StandardCharsets.UTF_8, new String[]{"bad.xlsx"}, new byte[][]{{1, 2, 3}}))), null)
                 .files.get(1);
         File directory = temporary.newFolder();
         try {
-            new DataExtractor(item, params()).getProductsFromFile(directory.getPath());
+            new DataExtractor(item, params()).getProductsFromFile(directory.getPath(), "http://127.0.0.1:1/not-used");
             fail("Invalid Excel must not become a successful empty import");
         } catch (IOException expected) {
-            assertTrue(expected.getMessage().contains("bad.xls"));
+            assertTrue(expected.getMessage().contains("bad.xlsx"));
             assertEquals(0, directory.list().length);
         }
     }
 
+    @Test public void sendsDisguisedXlsToServerWithoutTryingLocalParser() throws Exception {
+        File source = temporary.newFile("legacy.xls");
+        Files.write(source.toPath(), "<html><table>supplier data</table></html>".getBytes(StandardCharsets.UTF_8));
+        File directory = temporary.newFolder();
+        try (ConverterServer server = new ConverterServer(200, workbook(true))) {
+            assertEquals(1, new DataExtractor(source, params())
+                    .getProductsFromFile(directory.getPath(), server.url()).size());
+            assertEquals(1, server.requests.get());
+            assertTrue(server.request.contains("<html><table>supplier data</table></html>"));
+        }
+        assertEquals(0, directory.list().length);
+    }
+
+    @Test public void conversionErrorsAbortZipImportAndCleanTemporaryFiles() throws Exception {
+        AtachmentEntity item = AttachmentReader.read(message(attachment("invoices.zip",
+                zip(StandardCharsets.UTF_8, new String[]{"invoice.xls"}, new byte[][]{workbook(false)}))), null)
+                .files.get(1);
+        for (int status : new int[]{500, 200}) {
+            File directory = temporary.newFolder();
+            // A 200 response containing HTML is not an Excel workbook either.
+            try (ConverterServer server = new ConverterServer(status, "<html>error</html>".getBytes(StandardCharsets.UTF_8))) {
+                try {
+                    new DataExtractor(item, params()).getProductsFromFile(directory.getPath(), server.url());
+                    fail("Expected import failure");
+                } catch (IOException expected) {
+                    assertEquals(1, server.requests.get());
+                    assertEquals(0, directory.list().length);
+                }
+            }
+        }
+    }
+
+    @Test public void emptyConversionResponseIsRejected() throws Exception {
+        File source = temporary.newFile("empty-response.xls");
+        Files.write(source.toPath(), new byte[]{1});
+        File directory = temporary.newFolder();
+        try (ConverterServer server = new ConverterServer(200, new byte[0])) {
+            try {
+                new DataExtractor(source, params()).getProductsFromFile(directory.getPath(), server.url());
+                fail("Expected empty-response error");
+            } catch (IOException expected) {
+                assertEquals(0, directory.list().length);
+            }
+        }
+    }
+
+    private static final class ConverterServer implements AutoCloseable {
+        private final HttpServer server;
+        final AtomicInteger requests = new AtomicInteger();
+        volatile String request = "";
+
+        ConverterServer(int status, byte[] response) throws IOException {
+            server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+            server.createContext("/converttoxlxs", exchange -> {
+                ByteArrayOutputStream input = new ByteArrayOutputStream();
+                byte[] buffer = new byte[8192];
+                int count;
+                while ((count = exchange.getRequestBody().read(buffer)) != -1) {
+                    input.write(buffer, 0, count);
+                }
+                request = new String(input.toByteArray(), StandardCharsets.ISO_8859_1);
+                requests.incrementAndGet();
+                exchange.sendResponseHeaders(status, response.length == 0 ? -1 : response.length);
+                exchange.getResponseBody().write(response);
+                exchange.close();
+            });
+            server.start();
+        }
+
+        String url() {
+            return "http://127.0.0.1:" + server.getAddress().getPort() + "/converttoxlxs";
+        }
+
+        @Override public void close() {
+            server.stop(0);
+        }
+    }
     private static ParamsEntity params() {
         return new ParamsEntity(2, 4, 3, 4, 1, 2, 1, 1, 1);
     }
