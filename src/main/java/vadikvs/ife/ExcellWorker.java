@@ -1,126 +1,57 @@
-/*
- *  Автор Вагин Вадим Сергеевич
- * e-mail: vadim@hoz.center
- */
 package vadikvs.ife;
 
+import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import jxl.Cell;
-import jxl.Sheet;
-import jxl.Workbook;
-import jxl.read.biff.BiffException;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-/**
- *
- * @author vadim
- */
-public class ExcellWorker {
+/** Reads XLS and XLSX locally without changing the source file. */
+public class ExcellWorker implements Closeable {
+    private final Workbook workbook;
 
-    private File file;
-    HSSFWorkbook xlsBook = null;
-    XSSFWorkbook xlsxBook = null;
-    Workbook jxlsBook = null;
-
-    public ExcellWorker(File file, String converterServer, String tempPath) {
+    public ExcellWorker(File file) throws IOException {
+        if (file == null) {
+            throw new IOException("Файл Excel не выбран.");
+        }
         try {
-            this.file = file;
-            String ext = Utility.getFileExtensions(file);
-            System.out.println(ext);
-            switch (ext) {
-                case "xlsx":
-                    xlsxBook = new XSSFWorkbook(new FileInputStream(file));
-                    xlsBook = null;
-                    break;
-                default:
-                    this.file = Utility.convertXLSToXLSXFile(file, converterServer, tempPath);
-                    System.out.println(this.file.getAbsolutePath());
-                    xlsxBook = new XSSFWorkbook(new FileInputStream(this.file));
-                    xlsBook = null;
-                    break;
-            }
-        } catch (IOException ex) {
-
-            Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
-
-        } catch (Exception ex) {
-            Logger.getLogger(ExcellWorker.class.getName()).log(Level.SEVERE, null, ex);
+            workbook = WorkbookFactory.create(file, null, true);
+        } catch (IOException | InvalidFormatException | RuntimeException ex) {
+            throw new IOException("Не удалось открыть «" + file.getName()
+                    + "». Нужен файл Excel XLS или XLSX без пароля.", ex);
         }
     }
 
+    /** Supplier row and column numbers are one-based. */
     public String getData(int row, int col) {
-        String data = "";
-        if (jxlsBook != null) {
-            data = getDatafromJXLS(row, col);
-        } else if (xlsxBook != null) {
-            data = getDatafromXLSX(row, col);
-        } else if (xlsBook != null) {
-            data = getDatafromXLS(row, col);
+        if (row < 1 || col < 1 || workbook.getNumberOfSheets() == 0) {
+            return "";
         }
-        return data;
+        Row sourceRow = workbook.getSheetAt(workbook.getActiveSheetIndex()).getRow(row - 1);
+        Cell cell = sourceRow == null ? null : sourceRow.getCell(col - 1);
+        if (cell == null) {
+            return "";
+        }
+        CellType type = cell.getCellTypeEnum();
+        if (type == CellType.FORMULA) {
+            // Read the result saved by Excel, without recalculating the document.
+            type = cell.getCachedFormulaResultTypeEnum();
+        }
+        if (type == CellType.STRING) {
+            return cell.getStringCellValue();
+        }
+        if (type == CellType.NUMERIC) {
+            return String.valueOf(cell.getNumericCellValue());
+        }
+        return "";
     }
 
-    private String getDatafromXLSX(int row, int col) {
-        String data = "";
-        int index_sheet = xlsxBook.getActiveSheetIndex();
-        XSSFSheet myExcelSheet = xlsxBook.getSheetAt(index_sheet);
-        XSSFRow rowH = myExcelSheet.getRow(row - 1);
-        if (rowH != null) {
-            XSSFCell cell = rowH.getCell(col - 1);
-            if (cell != null) {
-                if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
-                    data = cell.getStringCellValue();
-                }
-                if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
-                    data = String.valueOf(cell.getNumericCellValue());
-                }
-            }
-        }
-        return data;
+    @Override
+    public void close() throws IOException {
+        workbook.close();
     }
-
-    private String getDatafromXLS(int row, int col) {
-        String data = "";
-        int index_sheet = xlsBook.getActiveSheetIndex();
-        HSSFSheet myExcelSheet = xlsBook.getSheetAt(index_sheet);
-        HSSFRow rowH = myExcelSheet.getRow(row - 1);
-        if (rowH != null) {
-            HSSFCell cell = rowH.getCell(col - 1);
-            if (cell != null) {
-                if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-                    data = cell.getStringCellValue();
-                }
-                if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-                    data = String.valueOf(cell.getNumericCellValue());
-                }
-            }
-        }
-        return data;
-    }
-
-    private String getDatafromJXLS(int row, int col) {
-        String data = "";
-        Sheet sheet = jxlsBook.getSheet(0);
-        if (row - 1 < sheet.getRows()) {
-            if (col - 1 < sheet.getColumns()) {
-                Cell cell = sheet.getCell(col - 1, row - 1);
-                data = cell.getContents();
-            }
-        }
-        return data;
-    }
-
 }

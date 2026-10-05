@@ -22,6 +22,10 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.scene.control.Label;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -54,7 +58,12 @@ public class MailController implements Initializable {
     public Slot closeAction = new Slot(this, "onExitButton");
     public Slot firmChanged = new Slot(this, "onFirmChanged");
     private final ObservableList<MessageEntity> messageData = FXCollections.observableArrayList();
-    private ObservableList<String> atachData = FXCollections.observableArrayList();
+    private long attachmentRequest = 0;
+    private final ExecutorService attachmentLoader = Executors.newSingleThreadExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "ife-attachments");
+        thread.setDaemon(true);
+        return thread;
+    });
     private final ObservableList<AtachmentEntity> addData = FXCollections.observableArrayList();
     private Email email;
     private Stage stage;
@@ -85,7 +94,7 @@ public class MailController implements Initializable {
     @FXML
     private TableView<MessageEntity> mailTableView;
     @FXML
-    private ListView<String> fileListView;
+    private ListView<AtachmentEntity> fileListView;
     @FXML
     private TableView<AtachmentEntity> addedfileListView;
     @FXML
@@ -140,7 +149,8 @@ public class MailController implements Initializable {
                 Message[] messages = email.getMessages("INBOX", Integer.valueOf(count));
                 for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
                     final int counter = i;
-                    messageData.add(new MessageEntity(messages[counter]));
+                    MessageEntity loaded = new MessageEntity(messages[counter]);
+                    Platform.runLater(() -> messageData.add(loaded));
                 }
 
             } catch (Exception e) {
@@ -148,23 +158,7 @@ public class MailController implements Initializable {
             }
         }).start();
 
-        /* new Thread(
-                new Runnable() {
-            @Override
-            public void run() {
-                Message[] messages = email.getMessages("INBOX", Integer.valueOf(count));
-                for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
-                    final int counter = i;
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            messageData.add(new MessageEntity(messages[counter]));
-                        }
-                    });
-                }
-            }
-        }
-        ).start();*/
+
         sendButton.setDisable(
                 true);
         addButton.setDisable(
@@ -240,6 +234,8 @@ public class MailController implements Initializable {
 
     @FXML
     public void onExitButton() {
+        attachmentRequest++;
+        attachmentLoader.shutdownNow();
         email.disconnect();
         close.emit();
         Stage stage = (Stage) exitButton.getScene().getWindow();
@@ -248,52 +244,56 @@ public class MailController implements Initializable {
 
     @FXML
     public void onMailSelect() {
-        //
-
-        MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
-        atachData = entity.getAtach();
-        fileListView.setItems(atachData);
+        MessageEntity entity = mailTableView.getSelectionModel().getSelectedItem();
+        final long request = ++attachmentRequest;
+        fileListView.getItems().clear();
+        addButton.setDisable(true);
+        if (entity == null) {
+            return;
+        }
         emailBody.getEngine().loadContent(entity.getBody());
+        fileListView.setPlaceholder(new Label("Чтение вложений и ZIP…"));
+        Task<AttachmentReader.Result> task = new Task<AttachmentReader.Result>() {
+            @Override
+            protected AttachmentReader.Result call() throws Exception {
+                return entity.loadAttachments();
+            }
+        };
+        task.setOnSucceeded(event -> {
+            if (request != attachmentRequest) {
+                return;
+            }
+            AttachmentReader.Result result = task.getValue();
+            fileListView.setItems(FXCollections.observableArrayList(result.files));
+            fileListView.setPlaceholder(new Label("Нет вложений"));
+            addButton.setDisable(result.files.isEmpty());
+            if (!result.warnings.isEmpty()) {
+                Utility.showAlert("Вложения", "Некоторые архивы не удалось открыть",
+                        String.join("\n", result.warnings));
+            }
+        });
+        task.setOnFailed(event -> {
+            if (request == attachmentRequest) {
+                fileListView.setPlaceholder(new Label("Не удалось прочитать вложения"));
+                Utility.showAlert("Ошибка", "Не удалось прочитать вложения",
+                        task.getException().getMessage());
+            }
+        });
+        attachmentLoader.submit(task);
     }
 
     @FXML
     public void onAddButton() {
-        String filename = fileListView.getSelectionModel().selectedItemProperty().getValue();
-        MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
-        AtachmentEntity e = new AtachmentEntity(filename, entity);
-        boolean add = true;
-        /* for (int i = 0; i < addData.size(); i++) {
-            AtachmentEntity it = addData.get(i);
-            if ((Objects.equals(e.getMessageId(), it.getMessageId()))
-                    && e.getFilename().equals(it.getFilename())) {
-                add = false;
-            }
-        }*/
-        if (add) {
-            if (filename != "") {
-                if (filename != null) {
-                    addData.add(e);
-                    sendButton.setDisable(false);
-                }
-            }
+        AtachmentEntity selected = fileListView.getSelectionModel().getSelectedItem();
+        if (selected != null && !addData.contains(selected)) {
+            addData.add(selected);
+            sendButton.setDisable(false);
         }
-        //addButton.setDisable(true);
-
     }
-
     @FXML
     public void onFileSelect() {
-        //
-        /*String filename = fileListView.getSelectionModel().selectedItemProperty().getValue();
-        MessageEntity entity = mailTableView.getSelectionModel().selectedItemProperty().getValue();
-        if (atachData.size() > 0) {
-            if (filename != null) {
-                addButton.setDisable(false);
-            }
-        }*/
-
+        addButton.setDisable(fileListView.getSelectionModel().getSelectedItem() == null);
     }
-
     @FXML
     public void onMoreMessage() {
         String count = settings.getValue("countMail");
@@ -305,7 +305,8 @@ public class MailController implements Initializable {
                 for (int i = Integer.valueOf(count) - 1; i >= 0; i--) {
                     final int counter = i;
 
-                    messageData.add(new MessageEntity(messages[counter]));
+                    MessageEntity loaded = new MessageEntity(messages[counter]);
+                    Platform.runLater(() -> messageData.add(loaded));
                 }
 
             } catch (MessagingException ex) {
@@ -347,7 +348,12 @@ public class MailController implements Initializable {
         File file = fileChooser.showDialog(stage);
         if (file != null) {
             String path = file.getPath();
-            entity.saveAtach(path);
+            try {
+                entity.saveAtach(path);
+            } catch (IOException ex) {
+                Utility.showAlert("Ошибка", "Не удалось сохранить вложение", ex.getMessage());
+                saveButton.setDisable(false);
+            }
         }
 
     }
@@ -359,11 +365,15 @@ public class MailController implements Initializable {
         } else {
             ProductsList products = new ProductsList();
             String tempPath = settings.getValue("tempPath");
-            String converterServer = settings.getValue("converterServer");
             for (int i = 0; i < addData.size(); i++) {
                 AtachmentEntity entity = addData.get(i);
                 DataExtractor DE = new DataExtractor(entity, param);
-                products.addAll(DE.getProductsFromFile(tempPath, converterServer));
+                try {
+                    products.addAll(DE.getProductsFromFile(tempPath));
+                } catch (IOException ex) {
+                    Utility.showAlert("Ошибка импорта", "Файл не обработан", ex.getMessage());
+                    return;
+                }
             }
             RequestMaker req = new RequestMaker(products.get(), settings.getValue("server"),
                     textAddition.getText());
@@ -401,11 +411,13 @@ public class MailController implements Initializable {
             FileChooser chooser = new FileChooser();
             Stage stage = (Stage) exitButton.getScene().getWindow();
             File file = chooser.showOpenDialog(stage);
+            if (file == null) {
+                return;
+            }
             List<ProductEntity> products = new ArrayList<>();
             DataExtractor DE = new DataExtractor(file, param);
             String tempPath = settings.getValue("tempPath");
-            String converterServer = settings.getValue("converterServer");
-            products.addAll(DE.getProductsFromFile(tempPath, converterServer));
+            products.addAll(DE.getProductsFromFile(tempPath));
             RequestMaker req = new RequestMaker(products, settings.getValue("server"),
                     textAddition.getText());
             BrowserLauncher bl = new BrowserLauncher();
@@ -418,6 +430,7 @@ public class MailController implements Initializable {
                     settings.getValue("browser"));
 
         } catch (Exception e) {
+            Utility.showAlert("Ошибка импорта", "Файл не обработан", e.getMessage());
             Logger.getLogger(MainController.class
                     .getName()).log(Level.SEVERE, null, e);
 
