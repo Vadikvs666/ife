@@ -229,6 +229,42 @@ public class AttachmentImportTest {
         }
     }
 
+    @Test public void skipsInvalidNumbersAndContinuesWithFollowingRows() throws Exception {
+        byte[] data;
+        try (Workbook book = new XSSFWorkbook();
+                ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            Sheet sheet = book.createSheet("Invoice");
+            for (int i = 0; i < 4; i++) {
+                Row row = sheet.createRow(i);
+                row.createCell(0).setCellValue("item-" + i);
+                row.createCell(1).setCellValue("Товар " + i);
+                row.createCell(2).setCellValue(2);
+                row.createCell(3).setCellValue(100);
+            }
+            sheet.getRow(1).getCell(2).setCellValue("не число");
+            sheet.getRow(2).getCell(3).setCellValue("не число");
+            book.write(output);
+            data = output.toByteArray();
+        }
+        for (boolean xlsx : new boolean[]{true, false}) {
+            File source = temporary.newFile(xlsx ? "rows.xlsx" : "rows.xls");
+            Files.write(source.toPath(), xlsx ? data : workbook(false));
+            File directory = temporary.newFolder();
+            try (ConverterServer server = new ConverterServer(200, data)) {
+                ParamsEntity settings = new ParamsEntity(1, 5, 3, 4, 1, 2, 1, 1, 1);
+                List<ProductEntity> products = new DataExtractor(source, settings)
+                        .getProductsFromFile(directory.getPath(), server.url());
+                assertEquals(2, products.size());
+                assertEquals("item-0", products.get(0).getArticul());
+                assertEquals("item-3", products.get(1).getArticul());
+                assertEquals(2, products.get(1).getCount());
+                assertEquals(50f, products.get(1).getPrice(), 0.001f);
+                assertEquals(xlsx ? 0 : 1, server.requests.get());
+                assertEquals(0, directory.list().length);
+            }
+        }
+    }
+
     private static final class ConverterServer implements AutoCloseable {
         private final HttpServer server;
         final AtomicInteger requests = new AtomicInteger();

@@ -6,8 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class DataExtractor {
+    private static final Logger LOG = Logger.getLogger(DataExtractor.class.getName());
     private final AtachmentEntity atach;
     private final ParamsEntity param;
     private final File file;
@@ -59,8 +61,9 @@ public class DataExtractor {
                             list.add(new ProductEntity(artikul, name,
                                     Utility.prepareNumeric(count), Utility.prepareNumeric(summ)));
                         } catch (NumberFormatException ex) {
-                            throw new IOException("Не удалось прочитать числа в строке " + row
-                                    + " файла «" + source.getName() + "». Проверьте параметры импорта.", ex);
+                            // A malformed row must not stop the remaining invoice import.
+                            LOG.warning("Пропущена строка " + row + " файла «" + source.getName()
+                                    + "»: количество или сумма не являются числом.");
                         }
                     }
                 }
