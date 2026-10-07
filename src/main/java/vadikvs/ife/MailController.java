@@ -113,6 +113,11 @@ public class MailController implements Initializable {
     private TextField textAddition;
     private Settings settings;
     
+    /*кнопка для сбис*/
+    
+    @FXML
+    private Button sbisButton;
+    
     public Slot settingsChanged = new Slot(this, "settingChangeds");
 
     /**
@@ -435,6 +440,13 @@ public class MailController implements Initializable {
                     .getName()).log(Level.SEVERE, null, e);
 
         }
+    }
+    
+    @FXML
+    public void onSbisButton() {
+        //
+        Utility.showAlert("Sbis", "sbis",
+                        "sbis");
     }
 
 }
