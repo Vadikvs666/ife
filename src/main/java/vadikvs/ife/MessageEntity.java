@@ -5,8 +5,8 @@
 package vadikvs.ife;
 
 import java.util.Date;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.io.IOException;
+import javax.mail.MessagingException;
 import javax.mail.Message;
 
 
@@ -24,11 +24,11 @@ public class MessageEntity {
     private Date date;
     private Message message;
     
-    private ObservableList<String> atach;
+    private AttachmentReader.Result attachments;
 
     public MessageEntity(Message message) {
 
-        atach = FXCollections.observableArrayList();
+
         setMessage(message);
 
     }
@@ -43,6 +43,7 @@ public class MessageEntity {
 
     public void setMessage(Message message) {
         this.message = message;
+        this.attachments = null;
         getMessageData();
     }
 
@@ -78,12 +79,11 @@ public class MessageEntity {
         this.subject = subject;
     }
 
-    public ObservableList<String> getAtach() {
-        return atach;
-    }
-
-    public void setAtach(ObservableList<String> atach) {
-        this.atach = atach;
+    public synchronized AttachmentReader.Result loadAttachments() throws IOException, MessagingException {
+        if (attachments == null) {
+            attachments = AttachmentReader.read(message, this);
+        }
+        return attachments;
     }
 
     private void getMessageData() {
@@ -92,8 +92,7 @@ public class MessageEntity {
             setSubject(MessageUtility.getSubject(message));
             setDate(MessageUtility.getDate(message));
             setBody(MessageUtility.getBody(message));
-            setAtach(FXCollections.
-                    observableArrayList(MessageUtility.getAtaches(message)));       
+
     }
 
     public Date getDate() {
@@ -105,8 +104,6 @@ public class MessageEntity {
     }
 
     
-    public void saveAtachByFilename(String path,String filename){
-        MessageUtility.saveMessageAtachByFilename(path, filename, message);
-    }
+
 
 }

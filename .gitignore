@@ -1,1 +1,6 @@
+<<<<<<< HEAD
 /target/
+=======
+/target/
+/dist/
+>>>>>>> feature/zip-attachments-local-excel

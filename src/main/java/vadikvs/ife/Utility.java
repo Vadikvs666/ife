@@ -15,18 +15,6 @@ import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.client.entity.EntityBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import javafx.scene.control.Alert;
 import javafx.application.Platform;
 
@@ -89,30 +77,6 @@ public class Utility {
         return uri;
     }
 
-    public static File convertXLSToXLSXFile(File file, String converterServer, String tempPath) throws Exception {
-
-        HttpClient httpclient = HttpClientBuilder.create().build();;
-        HttpPost post = new HttpPost(converterServer);
-        FileBody fileBody = new FileBody(file, ContentType.DEFAULT_BINARY);
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-        builder.addPart("file", fileBody);
-        HttpEntity entity = builder.build();
-        post.setEntity(entity);
-        System.out.println("executing request " + post.getRequestLine());
-        HttpResponse response = httpclient.execute(post);
-        HttpEntity res = response.getEntity();
-        int responseCode = response.getStatusLine().getStatusCode();
-        System.out.println("Request Url: " + post.getURI());
-        System.out.println("Response Code: " + responseCode);
-        String filename = "temp.xlsx";
-        String path = tempPath;
-        InputStream in = res.getContent();
-        Utility.saveFile(in, filename, path);
-        File targetFile = new File(path + File.separatorChar + filename);
-        return targetFile;
-    }
-    
     public static void showAlert(String title,String header,String msg) {
     Platform.runLater(new Runnable() {
       public void run() {

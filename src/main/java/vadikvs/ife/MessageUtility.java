@@ -47,27 +47,11 @@ public class MessageUtility {
         return listAddress;
     }
 
-    public static void saveMessageAtachByFilename(String path, String filename, Message message) {
-        try {
-            Multipart multiPart = (Multipart) message.getContent();
-            for (int j = 0; j < multiPart.getCount(); j++) {
-                MimeBodyPart part = (MimeBodyPart) multiPart.getBodyPart(j);
-                if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
-                    if (MimeUtility.decodeText(part.getFileName()).equals(filename)) {
-                        Utility.saveFile(part.getInputStream(), filename, path);
-                    }
-                }
-            }
-        } catch (IOException | MessagingException ex) {
-            Logger.getLogger(MessageEntity.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     public static String getFrom(Message message) {
         String from = "";
         try {
             Address[] fromAddress = message.getFrom();
-            from = fromAddress[0].toString();
+            from = fromAddress == null || fromAddress.length == 0 ? "" : fromAddress[0].toString();
             from = MimeUtility.decodeText(from);
         } catch (UnsupportedEncodingException | MessagingException ex) {
             Logger.getLogger(MessageUtility.class.getName()).log(Level.SEVERE, null, ex);
@@ -127,26 +111,6 @@ public class MessageUtility {
             Logger.getLogger(MessageUtility.class.getName()).log(Level.SEVERE, null, ex);
         }
         return body;
-    }
-
-    public static List<String> getAtaches(Message message) {
-        List<String> atach = new ArrayList();
-        try {
-            String contentType = message.getContentType();
-            if (contentType.contains("multipart")) {
-                Multipart multiPart = (Multipart) message.getContent();
-                for (int j = 0; j < multiPart.getCount(); j++) {
-                    MimeBodyPart part = (MimeBodyPart) multiPart.getBodyPart(j);
-                    if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
-                        String filename = part.getFileName();
-                        atach.add(MimeUtility.decodeText(filename));
-                    }
-                }
-            }
-        } catch (IOException | MessagingException ex) {
-            Logger.getLogger(MessageUtility.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return atach;
     }
 
     private static String getText(Part p) throws

@@ -1,75 +1,84 @@
-/*
- *  Автор Вагин Вадим Сергеевич
- * e-mail: vadim@hoz.center
- */
 package vadikvs.ife;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import javax.mail.MessagingException;
+import java.util.logging.Logger;
 
-/**
- *
- * @author vadim
- */
 public class DataExtractor {
-
-    private AtachmentEntity atach;
-    private ParamsEntity param;
-    private File file;
+    private static final Logger LOG = Logger.getLogger(DataExtractor.class.getName());
+    private final AtachmentEntity atach;
+    private final ParamsEntity param;
+    private final File file;
 
     public DataExtractor(AtachmentEntity atach, ParamsEntity param) {
         this.atach = atach;
         this.param = param;
+        this.file = null;
     }
 
     public DataExtractor(File file, ParamsEntity param) {
         this.file = file;
         this.param = param;
+        this.atach = null;
     }
 
-    public List<ProductEntity> getProductsFromFile(String tempPath, String converterServer) {
-        List<ProductEntity> list = new ArrayList<>();
-        int start_row = param.getStart_row();
-        int max_row = param.getMax_row();
-        int count_col = param.getCount_col();
-        int summ_col = param.getSumm_col();
-        int artikul_col = param.getArtikul_col();
-        int name_col = param.getName_col();
-        if (this.file == null) {
-            this.file = getFileFromAtach(atach, tempPath);
+    public List<ProductEntity> getProductsFromFile(String tempPath, String converterServer) throws IOException {
+        if (param == null) {
+            throw new IOException("Сначала выберите фирму и параметры импорта.");
         }
-        ExcellWorker excell = new ExcellWorker(this.file, converterServer, tempPath);
-        for (int row = start_row; row < max_row; row++) {
-            String artikul = excell.getData(row, artikul_col);
-            String name = excell.getData(row, name_col);
-            String count = excell.getData(row, count_col);
-            String summ = excell.getData(row, summ_col);
-            if (count != "" && name != "" && summ != "") {
-
-                System.out.println("artikul: " + artikul + " name :" + name + " count: " + count + " summ: " + summ);
-                try {
-                    String preparedSumm = Utility.prepareNumeric(summ);
-
-                    ProductEntity entity = new ProductEntity(artikul, name,
-                            Utility.prepareNumeric(count),
-                            preparedSumm);
-                    list.add(entity);
-                } catch (Exception ex) {
-                    Utility.showAlert("Информация", "Строка в число проверьте параметры!", ex.toString());
+        File source = file;
+        Path temporaryDirectory = null;
+        File converted = null;
+        try {
+            if (source == null) {
+                if (atach == null) {
+                    throw new IOException("Файл не выбран.");
                 }
-            } else {
-                // ;
+                Path root = new File(tempPath).toPath();
+                Files.createDirectories(root);
+                temporaryDirectory = Files.createTempDirectory(root, "ife-import-");
+                source = atach.saveAtach(temporaryDirectory.toString());
+            }
+            List<ProductEntity> list = new ArrayList<>();
+            File excelFile = source;
+            // Preserve the original import route: only XLSX is read directly.
+            if (!Utility.getFileExtensions(source).equalsIgnoreCase("xlsx")) {
+                converted = ExcelConverter.convert(source, converterServer, tempPath);
+                excelFile = converted;
+            }
+            try (ExcellWorker excell = new ExcellWorker(excelFile)) {
+                for (int row = param.getStart_row(); row < param.getMax_row(); row++) {
+                    String artikul = excell.getData(row, param.getArtikul_col());
+                    String name = excell.getData(row, param.getName_col());
+                    String count = excell.getData(row, param.getCount_col());
+                    String summ = excell.getData(row, param.getSumm_col());
+                    if (!count.isEmpty() && !name.isEmpty() && !summ.isEmpty()) {
+                        try {
+                            list.add(new ProductEntity(artikul, name,
+                                    Utility.prepareNumeric(count), Utility.prepareNumeric(summ)));
+                        } catch (NumberFormatException ex) {
+                            // A malformed row must not stop the remaining invoice import.
+                            LOG.warning("Пропущена строка " + row + " файла «" + source.getName()
+                                    + "»: количество или сумма не являются числом.");
+                        }
+                    }
+                }
+            }
+            return list;
+        } finally {
+            if (converted != null) {
+                Files.deleteIfExists(converted.toPath());
+            }
+            if (temporaryDirectory != null) {
+                if (source != null) {
+                    Files.deleteIfExists(source.toPath());
+                }
+                Files.deleteIfExists(temporaryDirectory);
             }
         }
-        return list;
     }
-
-    private File getFileFromAtach(AtachmentEntity atach, String tempPath) {
-        atach.saveAtach(tempPath);
-        File file = new File(tempPath + File.separatorChar + atach.getFilename());
-        return file;
-    }
-
 }
